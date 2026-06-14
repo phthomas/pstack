@@ -1,0 +1,6 @@
+# OMC runtime state
+.omc/
+
+# OS / editor cruft
+.DS_Store
+*.swp
