@@ -2,7 +2,7 @@
 
 > An opinionated Claude Code workflow for turning a brain dump into a shipped product.
 
-pstack is a set of [Claude Code](https://docs.claude.com/en/docs/claude-code) skills (all prefixed `ps-`) plus a few document templates. It wraps one workflow: **get the whole product clear up front, then build it** — by hand a piece at a time, or unattended end to end while you sleep.
+pstack is a set of [Claude Code](https://docs.claude.com/en/docs/claude-code) skills (all prefixed `ps-`) plus a few document templates. It wraps one workflow: **get the whole product clear up front, then build it** — by hand a piece at a time, or unattended end to end while you sleep. Point it at a blank slate or a codebase that already exists — the same clarity-first front-end fits both.
 
 It exists because the bottleneck in building with an AI agent usually isn't the coding — the agent can code. It's the ambiguity between *"I have an idea"* and *"the agent knows exactly what to build."* pstack is machinery for collapsing that ambiguity, starting from the messiest possible input: a brain dump.
 
@@ -49,12 +49,14 @@ The document templates in this repo (`PRODUCT.md`, `CLAUDE.md`, `ROADMAP.md`, `s
 ```
 /ps-dump-check   gate your dump.md; it tells you what's missing
 /ps-sharpen      an interview turns the dump into sharpened_dump.md
-/ps-bootstrap    writes PRODUCT.md, CLAUDE.md, a ROADMAP.md index, and one spec per phase in specs/
+/ps-bootstrap    new project: writes PRODUCT.md, CLAUDE.md, a ROADMAP.md index, and one spec per phase
 /ps-clarify      closes the open questions across ALL phases
 /ps-test         turns acceptance criteria into (red) tests
 ```
 
 Write `dump.md` yourself first — a real brain dump of the whole product. Everything downstream is capped by it, and dictating it is faster than typing.
+
+**Already have a codebase?** Same front-end — write `dump.md` (the orientation kind: where to look, what to ignore, why, what's next), then `/ps-dump-check` and `/ps-sharpen` — then run `/ps-adopt` instead of `/ps-bootstrap`. It surveys your code guided by the sharpened dump and writes or augments `CLAUDE.md`, `PRODUCT.md`, and `ROADMAP.md`, reconciling with any existing docs rather than overwriting them. Continue from `/ps-clarify`.
 
 **Build it — pick a gear:**
 
@@ -65,6 +67,8 @@ Write `dump.md` yourself first — a real brain dump of the whole product. Every
 | Whole product | `/ps-dormammu-magic` | you're out of time; build it all overnight |
 
 All three stop at `/ps-close` — verify, review, merge. **Shipping is always your call;** the autonomous gears never merge or deploy, and they stop at a phase's hardstop rather than guessing.
+
+**Every new session,** run `/ps-resume` first — it rehydrates context (docs, git, tests) and tells you where you left off and what's next.
 
 Full activity map: [PSTACK.md](./PSTACK.md). Worked example, dump to build: [EXAMPLE.md](./EXAMPLE.md).
 

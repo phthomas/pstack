@@ -5,14 +5,25 @@
 pstack is a set of Claude Code skills (all prefixed `ps-`) that wrap a spec-driven workflow: get the whole product clear up front, then build it — by hand, one steered phase at a time, or the whole thing unattended.
 
 ## Once per project (cold start)
-1. Write `dump.md` — your brain dump of the whole product. Put real effort in; everything downstream is capped by it.
+Get it clear first — the same clarity-first front-end whether the project is new or already has code:
+1. Write `dump.md` — your brain dump. New project: the idea, the why, what "done" looks like. Existing codebase: orient the agent — where to look, what to ignore, why it exists, what you want next.
 2. `/ps-dump-check` — the gate. Ready? If not, it hands you the gaps; flesh them out and re-run.
 3. `/ps-sharpen` — an interview resolves the gaps -> `sharpened_dump.md`.
-4. `/ps-bootstrap` — writes `PRODUCT.md` + `CLAUDE.md` + a `ROADMAP.md` index + one spec file per phase in `specs/`, covering EVERY phase of the product.
-5. `/ps-clarify` — closes the open questions across ALL phase specs, so the product is fully specced before any building. This is your clarity bet.
-6. `/ps-test` — tests from the acceptance criteria.
+
+Then turn that into the project's docs — this step forks on whether code already exists:
+- New project -> `/ps-bootstrap` — writes `PRODUCT.md` + `CLAUDE.md` + a `ROADMAP.md` index + one spec per phase in `specs/`.
+- Existing codebase -> `/ps-adopt` — surveys the code (guided by the sharpened dump) and writes or augments the same docs, reconciling with any that already exist rather than overwriting.
+
+Picked the wrong one? Each checks the project state and redirects you: `/ps-bootstrap` in a repo that already has code sends you to `/ps-adopt`; `/ps-adopt` in an empty repo sends you to `/ps-bootstrap`. It's a heuristic with an override — confirm and it proceeds anyway.
+
+Then, both paths:
+4. `/ps-clarify` — close the open questions across ALL phase specs. This is your clarity bet.
+5. `/ps-test` — tests from the acceptance criteria.
 
 After that the product is specced: `ROADMAP.md` is the map, `specs/NN-*.md` is each phase's contract.
+
+## Every session
+Opening a fresh session on an existing pstack project? Run `/ps-resume` first — it reads `ROADMAP.md`, the active spec, `STATE.md`, git, and the tests, then briefs you on where things stand and the next action before any building. (It's the load-side bookend to `/ps-checkpoint`, which saves the handoff at session end.)
 
 ## Three gears for building it
 Same loop underneath; pick the autonomy you want.

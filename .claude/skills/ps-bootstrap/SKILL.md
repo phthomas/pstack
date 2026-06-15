@@ -13,7 +13,10 @@ description: >
 Cold-start orchestrator. Turn sharpened_dump.md into the durable docs, with the WHOLE product specced phase by phase so it's ready to clarify and build end to end.
 
 ## Steps
-1. Confirm this is a cold start: there's no existing CLAUDE.md / PRODUCT.md, or I explicitly asked. If they already exist, stop and point me to /ps-spec.
+1. Confirm this is actually a new project before writing anything:
+   - If the repo already contains real source code — application or library code, populated modules, real tests, beyond pstack's own scaffold and templates — this is a brownfield project. STOP and tell me to use /ps-adopt instead, which surveys the code rather than treating the repo as a blank slate. Only proceed if I confirm the project really is new (e.g. the code is throwaway scaffolding).
+   - If PRODUCT.md / CLAUDE.md / ROADMAP.md already exist with real content, the project is already set up. STOP and point me to /ps-resume (to pick up where I left off) or /ps-spec (to add a phase) — don't re-bootstrap or overwrite.
+   - Otherwise it's a genuine cold start: continue.
 2. Read sharpened_dump.md. If it doesn't exist, run /ps-sharpen first.
 3. Write the docs:
    - PRODUCT.md <- the durable vision, the problem, the direction (the why).

@@ -26,6 +26,8 @@ You brain-dump the whole product: the problem (catch reputational risk early), t
 ```
 The whole product is specced — the map in ROADMAP, a contract per phase in specs/.
 
+> **Already have a codebase?** Steps 1–2 are the same (a `dump.md` that *orients* — where to look, what to ignore, why it exists, what's next — then gate + sharpen). At this step, run `/ps-adopt` instead of `/ps-bootstrap`: it surveys the existing code and **writes or augments** the same docs — `CLAUDE.md` captures the stack and the conventions the code already follows; `ROADMAP.md` gets a short "current state" note plus the forward phases you want — reconciling with anything already there rather than overwriting. Then rejoin at step 4. Everything downstream is identical.
+
 ## 4. Clarify ALL phases — `/ps-clarify`
 ```
 > /ps-clarify
@@ -56,11 +58,14 @@ Or, with an hour and a specific target, one phase, steered:
 ```
 Or hands-on, piece by piece: `/ps-build`.
 
-## 7. The morning — review and `/ps-close`
+## 7. The morning — `/ps-resume`, then `/ps-close`
+New session, cold context. Rehydrate before touching anything:
 ```
-ROADMAP.md   — 01 done, 02 done, 03 in progress (stopped: triage API creds needed).
-Report       — 01/02 criteria green; review applied 3 simplifications; flagged 1
-               judgment call (dashboard caching) for you. 03 hit its hardstop.
+> /ps-resume
+→ Where we are: 01 done, 02 done, 03 in progress — stopped at its hardstop (triage
+  API creds). Last night's run walked all three; the fresh-context review applied 3
+  simplifications and flagged one judgment call (dashboard caching) for you.
+  Tests: 01 + 02 green, 03 red. Next action: deep-QA the flagged item, then /ps-close.
 > /ps-close
 → Verified 01 + 02, deep-QA'd the flagged item, merged. 03 left for a fix + re-run.
 ```
@@ -72,3 +77,4 @@ P3 stopped cleanly at its hardstop instead of guessing. You give it the missing 
 - **Hardstops make autonomy safe.** A phase that can't proceed stops and reports rather than barrelling on.
 - **Skills talk only through files.** Each reads and writes the shared docs (`ROADMAP.md`, `specs/`, `STATE.md`, `tests/`, git) — no hidden state. That's why you can stop, inspect, and re-run at any point, and swap any piece for your own.
 - **Match the fix to the magnitude.** Small change -> `/ps-spec` -> build -> `/ps-close`. A wrong direction -> `/ps-adr` + re-spec. (See PSTACK.md.)
+- **New or existing, and resumable.** The same front-end *adopts* a codebase (`/ps-adopt`) as easily as it *bootstraps* a new one (`/ps-bootstrap`), and every session starts with `/ps-resume` to rebuild context from the files — so the workflow fits wherever the code already is, and survives you closing the laptop.

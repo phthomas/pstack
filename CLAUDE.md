@@ -3,12 +3,9 @@
 > Stable project context, auto-loaded every session. Keep this readable in one sitting (~a page). If it grows past that, run `/ps-groom`: a phase's detail belongs in its spec file under specs/, current status in STATE.md, the product vision in PRODUCT.md.
 
 ## Session start
-Before doing any work in a new session:
-1. Read ROADMAP.md — the phase index and statuses. Find the phase that's in progress (or the next planned one), then open its spec file in specs/ for the requirements, acceptance criteria, and hardstop.
-2. Read STATE.md — where the last session left off and the next steps.
-3. Run `git log --oneline -10` and `git status` to see what actually changed.
+Before doing any work in a new session, run `/ps-resume` — it reads ROADMAP.md, the active phase's spec, STATE.md, and git, checks the tests, and briefs you on where things stand and the next action. (By hand, if you prefer: read ROADMAP.md and the in-progress phase's spec in specs/, read STATE.md, then `git log --oneline -10` and `git status`.)
 
-Then continue from STATE.md's "Next steps". If that phase's spec file still has `[OPEN: ...]` markers, close them with `/ps-clarify` before writing any code.
+Then continue from the briefing's next action. If the active phase's spec still has `[OPEN: ...]` markers, close them with `/ps-clarify` before writing any code.
 
 ## What we're building
 <!-- One line only. The full overview lives in PRODUCT.md — don't duplicate it here. -->
