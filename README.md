@@ -1,8 +1,8 @@
 # pstack
 
-> An opinionated Claude Code workflow for turning a brain dump into a shipped product.
+> An opinionated Claude Code & Codex workflow for turning a brain dump into a shipped product.
 
-pstack is a set of [Claude Code](https://docs.claude.com/en/docs/claude-code) skills (all prefixed `ps-`) plus a few document templates. It wraps one workflow: **get the whole product clear up front, then build it** — by hand a piece at a time, or unattended end to end while you sleep. Point it at a blank slate or a codebase that already exists — the same clarity-first front-end fits both.
+pstack is a set of [Claude Code](https://docs.claude.com/en/docs/claude-code) skills (all prefixed `ps-`) plus a few document templates — and because they use the shared `SKILL.md` format, they run on [Codex](https://developers.openai.com/codex) too. It wraps one workflow: **get the whole product clear up front, then build it** — by hand a piece at a time, or unattended end to end while you sleep. Point it at a blank slate or a codebase that already exists — the same clarity-first front-end fits both.
 
 It exists because the bottleneck in building with an AI agent usually isn't the coding — the agent can code. It's the ambiguity between *"I have an idea"* and *"the agent knows exactly what to build."* pstack is machinery for collapsing that ambiguity, starting from the messiest possible input: a brain dump.
 
@@ -11,11 +11,11 @@ Want the reasoning? Read [WHY.md](./WHY.md). Just want to use it? Keep going.
 ## Is this for you?
 
 It fits if you:
-- use Claude Code,
+- use Claude Code or Codex,
 - have more ideas than time, and think by dumping them out rather than writing clean specs,
 - are happy to adopt an opinionated workflow instead of assembling your own.
 
-It's probably *not* for you if you want a neutral, unopinionated framework, or you're not on Claude Code. This is my workflow, shared — not a product.
+It's probably *not* for you if you want a neutral, unopinionated framework, or you're on an agent that doesn't read `SKILL.md` (today that's Claude Code and Codex). This is my workflow, shared — not a product.
 
 ## The idea in 30 seconds
 
@@ -26,19 +26,27 @@ It's probably *not* for you if you want a neutral, unopinionated framework, or y
 
 ## Install
 
-pstack is really just the `ps-` skills plus a workflow. Install the skills:
+pstack is really just the `ps-` skills plus a workflow — and they use the shared `SKILL.md` format, so they run on **Claude Code** and **Codex** alike.
+
+**Claude Code** — skills live in `.claude/skills/`:
 
 ```bash
-# into one project:
-cp -r path/to/pstack/.claude/skills/ps-* your-project/.claude/skills/
-
-# or for every project:
-cp -r path/to/pstack/.claude/skills/ps-* ~/.claude/skills/
+cp -r path/to/pstack/.claude/skills/ps-* your-project/.claude/skills/   # one project
+cp -r path/to/pstack/.claude/skills/ps-* ~/.claude/skills/              # every project
 ```
 
 Restart Claude Code (skills load at startup) and run `/skills` to confirm they're registered.
 
-> Each skill must sit at `.claude/skills/<name>/SKILL.md` — not double-nested.
+**Codex** — skills live in `.agents/skills/`, and Codex auto-loads `AGENTS.md` (pstack's `AGENTS.md` bridges to `CLAUDE.md`):
+
+```bash
+cp -r path/to/pstack/.agents/skills/ps-* your-project/.agents/skills/   # one project
+cp -r path/to/pstack/.agents/skills/ps-* ~/.agents/skills/             # every user
+```
+
+Restart Codex; the skills trigger by description or as slash commands. (Codex skill paths have shifted across versions — if `.agents/skills` isn't picked up, check your version's docs, e.g. `~/.codex/skills`.)
+
+> Each skill sits at `<tree>/skills/<name>/SKILL.md` — not double-nested. The two trees hold identical `SKILL.md` files: `.claude/skills/` is canonical, and `scripts/sync-skills.sh` regenerates `.agents/skills/` from it.
 
 The document templates in this repo (`PRODUCT.md`, `CLAUDE.md`, `ROADMAP.md`, `specs/_TEMPLATE.md`, `STATE.md`, …) show what `/ps-bootstrap` produces — you don't copy them in by hand; `/ps-bootstrap` writes them into your project from your dump. The one file you start with is your own `dump.md`.
 
@@ -86,7 +94,7 @@ Full activity map: [PSTACK.md](./PSTACK.md). Worked example, dump to build: [EXA
 This is my personal, opinionated workflow, released as-is. **Fork it, crib it, rip out the Marvel names (`dormammu` is just "build it autonomously"), bend it to your stack.**
 
 - **No maintenance promise.** Issues and PRs may sit unanswered. I change it when *my* projects need it changed.
-- **It's glued to Claude Code's skill mechanism, which moves.** It may break when that changes. If it does, fork and fix.
+- **It rides the agents' skill mechanisms, which move.** The `SKILL.md` format is shared by Claude Code and Codex now, but both still change; it may break when they do. If it does, fork and fix.
 - The defaults and taste are mine. That's the point of an opinionated tool — and the first thing you should override.
 
 Built in the spirit of the Claude Code workflow toolkits that came before it (gstack, oh-my-claudecode, and others). This is my take.
