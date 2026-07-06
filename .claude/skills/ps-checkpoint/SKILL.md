@@ -3,8 +3,8 @@ name: ps-checkpoint
 description: >
   pstack: overwrite STATE.md with the current handoff state so the next session can
   resume cleanly. Use this at the end of a working session, before I stop, or
-  whenever I type /ps-checkpoint or say things like "save progress", "where were
-  we", or "wrap up for now" — even if I don't mention STATE.md.
+  whenever I type /ps-checkpoint or say things like "save progress" or "wrap up
+  for now" — even if I don't mention STATE.md.
 ---
 
 # Update the session handoff (STATE.md)

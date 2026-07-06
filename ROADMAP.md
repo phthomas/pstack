@@ -1,6 +1,6 @@
 # ROADMAP.md — the index
 
-> The whole product at a glance: every phase, its status, and a link to its spec. This is the map; the detailed contract for each phase lives in `specs/`. PRODUCT.md says *why*; this says *what, in what order, and where each phase's spec is*. `/ps-dormammu-magic` walks this top to bottom; `/ps-dormammu-phase` and `/ps-build` work one phase from here.
+> The whole product at a glance: every phase, its status, and a link to its spec. This is the map; the detailed contract for each phase lives in `specs/`. PRODUCT.md says *why*; this says *what, in what order, and where each phase's spec is*. `/ps-dormammu` walks this top to bottom (or just the scope you give it); `/ps-build` works one phase from here.
 
 ## Phases at a glance
 <!-- Keep this in sync with the files in specs/. Phase-level status lives HERE; the per-criterion checkboxes live in each spec file. -->

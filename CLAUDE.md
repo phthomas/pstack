@@ -1,11 +1,11 @@
 # CLAUDE.md
 
-> Stable project context, auto-loaded every session. Keep this readable in one sitting (~a page). If it grows past that, run `/ps-groom`: a phase's detail belongs in its spec file under specs/, current status in STATE.md, the product vision in PRODUCT.md.
+> Stable project context, auto-loaded every session. Keep this readable in one sitting (~a page). If it grows past that, prune it: a phase's detail belongs in its spec file under specs/, current status in STATE.md, the product vision in PRODUCT.md.
 
 ## Session start
 Before doing any work in a new session, run `/ps-resume` — it reads ROADMAP.md, the active phase's spec, STATE.md, and git, checks the tests, and briefs you on where things stand and the next action. (By hand, if you prefer: read ROADMAP.md and the in-progress phase's spec in specs/, read STATE.md, then `git log --oneline -10` and `git status`.)
 
-Then continue from the briefing's next action. If the active phase's spec still has `[OPEN: ...]` markers, close them with `/ps-clarify` before writing any code.
+Then continue from the briefing's next action. `[OPEN: ...]` markers in the active spec are fine — `/ps-build` and `/ps-dormammu` raise them before writing any code; answer them when asked.
 
 ## What we're building
 <!-- One line only. The full overview lives in PRODUCT.md — don't duplicate it here. -->
@@ -13,7 +13,7 @@ Then continue from the briefing's next action. If the active phase's spec still 
 ## Architecture
 <!-- The durable shape of the system. Edit to match your project. -->
 - Stack / language: <!-- e.g. Python 3.12; or Go; or TypeScript/Node; or Rust -->
-- Test framework: <!-- e.g. pytest; go test; vitest; cargo test — /ps-test writes tests in this -->
+- Test framework: <!-- e.g. pytest; go test; vitest; cargo test — the build skills write tests in this -->
 - Data / key libraries: <!-- e.g. Polars + DuckDB on Parquet; or your equivalent -->
 - Key modules and their boundaries: <!-- the few that matter -->
 
@@ -21,7 +21,7 @@ Then continue from the briefing's next action. If the active phase's spec still 
 <!-- How we build here. Keep the universal ones; replace the stack-specific line with yours. -->
 - Optimize for readability over cleverness: the simplest solution that works wins, and less code beats more.
 - Keep functions small and single-purpose; prefer explicit code over heavy framework magic.
-- One phase = one branch = one PR. Acceptance criteria become tests.
+- One phase = one branch = one PR; a multi-phase `/ps-dormammu` run rides one run branch, committed per phase. Acceptance criteria become tests — the build skills write them, red first.
 - Stack-specific conventions go here — e.g. Python: prefer Polars over pandas, type hints on public functions; Go: idiomatic error handling, no needless interfaces; etc.
 
 ## Always / never
@@ -46,4 +46,4 @@ Route any note by how often it changes:
 - A phase's contract — requirements, acceptance criteria, hardstop -> specs/<phase>.md
 - Per-session (where we are, next steps) -> STATE.md
 - Decisions and their rationale -> docs/adr/ (append-only)
-- Initialization scratch (raw + sharpened brief) -> dump.md / sharpened_dump.md
+- A braindump — new project, adopted codebase, or new ideas for a live one -> dump.md, then /ps-start

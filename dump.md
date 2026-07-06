@@ -1,45 +1,14 @@
-# dump.md — brain dump (project initialization)
+# dump.md — braindump. Don't organize it; that's /ps-start's job.
 
-> Your raw thinking. Messy is fine — don't neaten it. But put real effort here: everything downstream is capped by this dump. Clarity of thought now is what saves time in execution later.
-> New project from scratch? Fill "Building something new", then `/ps-dump-check` -> `/ps-sharpen` -> `/ps-bootstrap`.
-> Existing codebase you're adopting pstack into? Fill "Adopting an existing codebase", then `/ps-dump-check` -> `/ps-sharpen` -> `/ps-adopt`.
-> Adding or changing a phase on an existing pstack project? Skip this and use `/ps-spec`.
+> Talk, don't write — dictation beats typing here. Wrong order, contradictions, half-ideas, wrong section: all fine. The interview sorts it out. Effort here still pays — everything downstream is capped by what you say — but effort means *more thoughts*, not tidier ones.
+> When you run dry, run `/ps-start`. Too thin and it tells you exactly what's missing; anything still fuzzy gets asked when it matters, not all up front.
+> Reusable for all three situations — a new project, an existing codebase (the code gets surveyed first; only say what it can't: the why, the intent, the pain), or new ideas for a live pstack project. Same three headings. Overwrite freely; this is scratch, not a record.
 
-## Building something new
-<!-- Greenfield. -->
+## What is this and why
+<!-- The idea, the itch, who it's for. Existing codebase: what this code is and why it exists — the part the code can't say. -->
 
-### What I want to build
-<!-- The outcome, not just a topic. -->
+## What does done look like
+<!-- What you could demo when it works. Must-haves vs nice-to-haves, if you know them. Rough phases, if you already see them. -->
 
-### Why / context
-<!-- The problem, who it's for, the constraints (on-prem, stack, deadlines, team). -->
-
-### What "done" / working looks like
-<!-- Rough success criteria — even fuzzy is fine, but say something. -->
-
-### In scope / out of scope
-<!-- What this is, and explicitly what it is not. -->
-
-### What I already know vs. don't
-<!-- Decisions you've already made; open questions and uncertainties you're aware of. -->
-
-## Adopting an existing codebase
-<!-- Brownfield. The code is the source of truth for WHAT exists; this section orients the agent and supplies the WHY and the forward intent that code can't. -->
-
-### Where to look / what to focus on
-<!-- The parts of the repo that matter, the main entry points, the modules you care about. -->
-
-### What to ignore
-<!-- Dead code, legacy folders, generated files — anything not worth surveying. -->
-
-### Why it exists / where it's going
-<!-- The purpose the code can't tell the agent, and the direction you want to take it. -->
-
-### What I want next
-<!-- The forward work: the new phases or improvements you're adopting pstack to build. -->
-
-### Known pain points / constraints
-<!-- Where it's fragile, what's confusing, the constraints (stack, on-prem, deploy). -->
-
-## Anything else
-<!-- References, links, half-formed ideas — for either path. -->
+## What I already know
+<!-- Anything fixed or ruled out: stack, constraints, deadlines, integrations, prior art, links. Existing code: where to look, what to ignore, what hurts. "Nothing yet" is fine. -->

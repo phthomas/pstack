@@ -1,21 +1,25 @@
 ---
 name: ps-spec
 description: >
-  pstack: add a new phase to the product, or revise/re-open an existing one. Use when
-  I type /ps-spec, when I say "add a phase", "spec a new phase", "re-open phase 2", or
-  "we need another phase for X". Edits ROADMAP.md and the spec files in specs/ — the
-  phases are specced up front by /ps-bootstrap, so this is for changing the plan after
-  the fact.
+  pstack: change the plan — add a phase, revise or re-open one, reorder the
+  phases, or correct the current phase mid-build when a hypothesis turns out
+  wrong. Use when I type /ps-spec, or say "add a phase", "re-open phase 2",
+  "reorganize the phases", "cut phase 3", "this approach isn't working",
+  "let's change direction", or "the spec was wrong". Edits ROADMAP.md and
+  specs/ together so they stay consistent. Revising is the workflow working,
+  not failing.
 ---
 
-# Add or revise a phase
+# Change the plan (add / revise / re-open / reorder)
 
-The whole product is specced at bootstrap (a ROADMAP index + one spec file per phase). Use this to change that plan: add a phase, re-scope one, or re-open a done phase.
+/ps-start specs the whole product; this changes that plan afterwards. The spec is a hypothesis — execution is allowed to correct it.
 
 ## Steps
-1. Take my intent. If it's too vague to scope, ask a couple of targeted questions — keep it light (on Claude Code, AskUserQuestion suits these well); deep ambiguity is /ps-clarify's job.
-2. Edit the docs:
-   - New phase: create specs/NN-name.md from specs/_TEMPLATE.md (Goal, Requirements, Acceptance criteria checklist, Hardstop / kill, Open questions, Out of scope), and add a row to ROADMAP.md's table in the right order, with its status and whether it's in the MVP.
-   - Revise / re-open: update the phase's spec file and set its status in ROADMAP.md (e.g. back to in progress).
-3. If the change reveals a durable convention or a direction shift, propose a one-line update to CLAUDE.md / PRODUCT.md — but ask before editing those.
-4. Hand off: /ps-clarify to close any new open items, then /ps-test for the criteria.
+1. Take my intent. Too vague to scope? Ask a few targeted questions with recommended defaults (AskUserQuestion on Claude Code; plain text elsewhere) — this skill closes its own ambiguity. If the change is bigger than a sentence or two can carry — a pile of ideas, a v2 — send me to dump.md + /ps-start instead, which extends the plan from a fresh dump.
+2. Apply the mechanics, keeping ROADMAP.md and specs/ consistent:
+   - **Add**: create specs/NN-name.md from specs/_TEMPLATE.md (or match the shape of the existing specs) and add its ROADMAP row (status, in-MVP, spec link), numbered in order.
+   - **Revise / re-open**: update the phase's spec — requirements and acceptance criteria — and set its ROADMAP status (e.g. back to in progress). For a mid-build correction, first write down what we learned that invalidated the spec, then revise it to match reality, and note the direction change in STATE.md's "In flight".
+   - **Reorder**: renumber the spec files and the ROADMAP rows together.
+   - **Drop**: park the idea in BACKLOG.md rather than deleting it.
+3. New uncertainty is fine: leave [OPEN: ...] markers — the build skills raise them when the phase starts. If criteria changed on a phase that already has tests, the next build pass reconciles the tests first.
+4. Size the change: a real architectural or directional shift also gets /ps-adr (why we changed), and — with my OK — a PRODUCT.md or CLAUDE.md update.

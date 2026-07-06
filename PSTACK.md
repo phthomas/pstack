@@ -1,67 +1,51 @@
 # PSTACK.md — how to drive pstack
 
-> The activity map: which skill to run when. New here? See `EXAMPLE.md` for a worked walkthrough from a dump to a built product.
+> The activity map: eight skills, one flow. New here? `EXAMPLE.md` is a worked walkthrough from a dump to a built product.
 
-pstack is a set of Claude Code skills (all prefixed `ps-`) that wrap a spec-driven workflow: get the whole product clear up front, then build it — by hand, one steered phase at a time, or the whole thing unattended.
+pstack wraps one workflow: braindump -> specced product -> built product, with shipping always yours. Eight skills, `ps-` prefixed; three of them do most of the work.
 
-## Once per project (cold start)
-Get it clear first — the same clarity-first front-end whether the project is new or already has code:
-1. Write `dump.md` — your brain dump. New project: the idea, the why, what "done" looks like. Existing codebase: orient the agent — where to look, what to ignore, why it exists, what you want next.
-2. `/ps-dump-check` — the gate. Ready? If not, it hands you the gaps; flesh them out and re-run.
-3. `/ps-sharpen` — an interview resolves the gaps -> `sharpened_dump.md`.
-
-Then turn that into the project's docs — this step forks on whether code already exists:
-- New project -> `/ps-bootstrap` — writes `PRODUCT.md` + `CLAUDE.md` + a `ROADMAP.md` index + one spec per phase in `specs/`.
-- Existing codebase -> `/ps-adopt` — surveys the code (guided by the sharpened dump) and writes or augments the same docs, reconciling with any that already exist rather than overwriting.
-
-Picked the wrong one? Each checks the project state and redirects you: `/ps-bootstrap` in a repo that already has code sends you to `/ps-adopt`; `/ps-adopt` in an empty repo sends you to `/ps-bootstrap`. It's a heuristic with an override — confirm and it proceeds anyway.
-
-Then, both paths:
-4. `/ps-clarify` — close the open questions across ALL phase specs. This is your clarity bet.
-5. `/ps-test` — tests from the acceptance criteria.
-
-After that the product is specced: `ROADMAP.md` is the map, `specs/NN-*.md` is each phase's contract.
+## The happy path
+1. **Braindump into `dump.md`** — three loose headings, no structure required. Dictate if you can. Messy is the intended input.
+2. **`/ps-start`** — gates the dump (too thin? it tells you exactly what's missing), interviews you on the gaps, then writes PRODUCT.md, CLAUDE.md, ROADMAP.md, and one spec per phase in specs/. One command for all three situations — it detects which:
+   - blank repo -> specs the whole product;
+   - existing codebase -> surveys the code *first*, then asks only what the code can't answer; writes or augments the docs, never overwriting;
+   - live pstack project -> extends the plan with the new ideas.
+3. **Build, at the autonomy you want:**
+   - `/ps-build` — hands-on: one phase; resolves its open questions with you, writes its tests and shows them red for your check, then implements to green, pausing for steering.
+   - `/ps-dormammu [mvp | N | N-M] [context]` — autonomous: pre-flights the open questions in one batch while you're still at the keyboard, then walks each phase (tests red -> build green -> QA -> fresh-context review -> commit) on a branch, never merging. No argument = every remaining phase.
+4. **`/ps-close`** — verify criteria against the tests, review the diff (complete + clean), record ADRs, checkpoint, merge. The merge is yours.
 
 ## Every session
-Opening a fresh session on an existing pstack project? Run `/ps-resume` first — it reads `ROADMAP.md`, the active spec, `STATE.md`, git, and the tests, then briefs you on where things stand and the next action before any building. (It's the load-side bookend to `/ps-checkpoint`, which saves the handoff at session end.)
+- Start: `/ps-resume` — reads ROADMAP.md, the active spec, STATE.md, and git; runs the tests; briefs you and proposes the next action. If STATE.md and reality disagree, it trusts git and the tests.
+- Stop: `/ps-checkpoint` — overwrites STATE.md with the handoff. (`/ps-close` and `/ps-dormammu` run it themselves.)
 
-## Three gears for building it
-Same loop underneath; pick the autonomy you want.
-- `/ps-build` — interactive: implement a piece of the current phase, pausing so you can steer. Hands-on. Ticks criteria in the phase's spec as they pass.
-- `/ps-dormammu-phase <context>` — autonomous on ONE phase you name, shaped by the context you pass in. The focused gear, for when you have time to aim it.
-- `/ps-dormammu-magic` — autonomous over the WHOLE product: walks every phase in `ROADMAP.md` (build -> QA -> tests -> fresh-context review -> update status + `STATE.md` -> commit -> next), on a feature branch, never merging. Leaves a morning report and a full build. For when you're out of time.
+## Changing the plan
+- Fits in a sentence -> just say it: "add a phase for X", "re-open phase 2", "reorganize the order", "this approach isn't working". `/ps-spec` catches it — keeps ROADMAP.md and specs/ consistent, parks dropped ideas in BACKLOG.md, and records an ADR when the change is directional.
+- Bigger than a sentence — a pile of ideas, a v2 -> braindump into `dump.md` again and run `/ps-start`; it extends the plan instead of starting over.
+- A significant technical decision, made or reversed -> `/ps-adr` records the why (append-only; the other skills mostly trigger it for you).
 
-All three stop at the same place: `/ps-close`. Shipping is always your call.
-
-## Close the loop
-1. `/ps-staff-review` — code-quality review against the readability/simplicity bar (the dormammu skills run this in fresh context themselves).
-2. `/ps-revise` — if a hypothesis turns out wrong mid-build, correct the phase's spec and keep going.
-3. `/ps-close` — verify the phase (or whole build), review, merge, mark phases done in `ROADMAP.md`. After a dormammu run, this is your deep-QA pass over the flagged items.
-
-## As needed
-- `/ps-spec` — add a new phase, or revise/re-open one (the phases are specced up front; this changes the plan later).
-- `/ps-clarify` — re-run any time open questions appear; point it at one phase or let it sweep all.
-- `/ps-review` — zoom out on strategy/architecture; confirms the direction or flags risks with alternatives.
-- `/ps-adr` — record a significant or architectural decision (append-only).
-- `/ps-checkpoint` — overwrite `STATE.md` with a clean handoff.
-- `/ps-groom` — keep `CLAUDE.md` lean; move detail to where it belongs.
+## Design principles (why there's no step for X)
+- **Conversation is the primary interface.** The slash commands are muscle-memory handles; every skill also triggers on plain intent ("build it", "ship it", "where were we").
+- **Clarification is a behavior, not a stage.** /ps-start asks while drafting; /ps-build asks before coding its phase; /ps-dormammu asks once at pre-flight, then assumes-and-records the safe calls and hardstops on the load-bearing ones. `[OPEN: ...]` markers in later phases are healthy — they get answered at the last responsible moment, when you know the most.
+- **Tests are not a step.** Each build gear turns the phase's acceptance criteria into red tests before implementing. "Done" stays executable; you never schedule it.
+- **No skill where a sentence works.** An architecture sanity-check, doc grooming, a mid-phase code review — just ask for them. A skill exists only where there's a gate to enforce (/ps-start, /ps-close), a guardrail to hold unattended (/ps-dormammu), or file mechanics to keep consistent (/ps-spec, /ps-adr, /ps-checkpoint, /ps-resume).
 
 ## When something's wrong, match the fix to the magnitude
-- A detail inside a phase -> `/ps-revise` (or `/ps-clarify` if it was never decided).
-- A phase's goal is wrong -> `/ps-spec` re-open or re-scope it (or split it); park the old idea in `BACKLOG.md`.
-- The product direction or architecture -> `/ps-adr` the why, update `PRODUCT.md` / `CLAUDE.md`, then `/ps-spec` the phases of the new direction.
+- A detail inside a phase -> say it while building; the spec gets updated as you steer.
+- A phase's goal, order, or existence -> `/ps-spec`: re-scope, re-open, reorder, or park it in BACKLOG.md.
+- The product direction or architecture -> `/ps-adr` the why, update PRODUCT.md / CLAUDE.md, then `/ps-spec` the new phases.
 - A different product -> new repo.
 
 ## The artifacts
 (Names are unbranded on purpose: `CLAUDE.md` is a Claude Code convention and must keep that name; the rest read clearer plain.)
-- `dump.md` / `sharpened_dump.md` — scratch + provenance (cold-start only).
-- `PRODUCT.md` — vision/why (slow). `CLAUDE.md` — how you build (slow).
-- `ROADMAP.md` — the product map: every phase, its status, and a link to its spec. `/ps-dormammu-magic` walks it.
-- `specs/NN-*.md` — one per phase: the contract (requirements, acceptance-criteria checklist, hardstop). The build skills open just the phase they're working on.
-- `STATE.md` — where we are, next steps (per-session; the dormammu skills update it as they go).
+- `dump.md` — the braindump inbox: new project, adopted codebase, or new ideas for a live one. Scratch; overwrite freely.
+- `PRODUCT.md` — vision/why (slow). `CLAUDE.md` — how you build (slow). `AGENTS.md` — a two-line bridge pointing AGENTS.md-readers (Codex, pi, oh-my-pi) at CLAUDE.md.
+- `ROADMAP.md` — the product map: every phase, its status, and a link to its spec. `/ps-dormammu` walks it.
+- `specs/NN-*.md` — one per phase: the contract (requirements, acceptance-criteria checklist, hardstop). `[OPEN: ...]` markers welcome until the phase builds.
+- `STATE.md` — where we are, next steps (per-session; the autonomous runs update it as they go).
 - `docs/adr/` — decisions, append-only. `tests/` — enforced acceptance criteria. `BACKLOG.md` — parked tangents.
 
 ## Notes
-- Skills compose: `/ps-bootstrap`, `/ps-close`, and `/ps-dormammu-magic` orchestrate the smaller ones; `/ps-dormammu-phase` reuses `-magic`'s loop on one phase.
-- Steer a skill by pre-answering in the invocation, e.g. `/ps-clarify use DuckDB for storage because it's already in our stack`.
+- Steer any skill by pre-answering in the invocation: `/ps-dormammu 3 use DuckDB for storage; correctness over speed`.
 - Calibrate: trivial fixes skip the pipeline entirely. The flow is for non-trivial, shippable work.
+- The skills compose through files only (ROADMAP.md, specs/, STATE.md, tests/, git) — no hidden state. Stop, inspect, or re-run at any point.

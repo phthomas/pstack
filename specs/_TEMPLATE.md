@@ -15,11 +15,11 @@
 - [ ]
 
 ## Hardstop / kill criteria
-<!-- When to stop this phase and escalate instead of pushing on: a blocker that needs me, a missing dependency, or a sign it's the wrong bet. /ps-dormammu-magic and /ps-dormammu-phase obey these. -->
+<!-- When to stop this phase and escalate instead of pushing on: a blocker that needs me, a missing dependency, or a sign it's the wrong bet. /ps-dormammu obeys these. -->
 -
 
 ## Open questions
-<!-- [OPEN: ...] items for this phase. /ps-clarify closes them. Empty is good. -->
+<!-- [OPEN: ...] items for this phase. The build skills raise them when the phase starts: /ps-dormammu at pre-flight, /ps-build before coding. Empty is good. -->
 -
 
 ## Out of scope

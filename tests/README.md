@@ -1,6 +1,6 @@
 # tests/
 
-Tests live here, written in your project's framework — set in CLAUDE.md and chosen by `/ps-test`. The framework is a per-project choice; the pattern below is the same in any language.
+Tests live here, written in your project's framework — set in CLAUDE.md. The build skills (`/ps-build`, `/ps-dormammu`) write them from each phase's acceptance criteria. The framework is a per-project choice; the pattern below is the same in any language.
 
 Write three kinds, and only these:
 
