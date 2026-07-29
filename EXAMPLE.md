@@ -33,8 +33,9 @@ Out of time; want the product by morning:
   needs your on-call setup; no safe assumption.
 > 5 min is fine; route triage to the #oncall queue
 → Branch feat/complaint-detector. Walking 01 -> 02 -> 03, per phase:
-  tests from criteria (red) -> build to green -> QA loop -> fresh-context
-  review -> commit. Hardstops obeyed. Report when I stop.
+  one fresh-context builder per phase: tests from criteria (red) -> build to
+  green -> mechanical gate -> review panel -> commit. Hardstops obeyed.
+  Report when I stop.
 ```
 With an hour and a target instead: `/ps-dormammu 2 reuse the old chart components`. Hands-on instead: `/ps-build` — it writes the phase's tests, shows them red for your check, then implements to green, pausing for steering.
 
@@ -43,7 +44,8 @@ New session, cold context. Rehydrate before touching anything:
 ```
 > /ps-resume
 → 01 done, 02 done, 03 stopped at its hardstop (triage API credentials).
-  The fresh-context review applied 3 simplifications; 1 judgment call flagged
+  The panel applied 3 simplifications; 1 judgment call flagged
+  (panel: correctness ✓ inline · parsimony ✓ inline · product ✓ · security — not triggered)
   (dashboard caching). Tests: 01 + 02 green, 03 red.
   Next action: deep-QA the flagged item, then /ps-close.
 > /ps-close

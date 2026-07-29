@@ -5,14 +5,27 @@
 ## Goal
 <!-- One or two sentences: what this phase delivers and why. -->
 
+## Coordination
+<!-- OPTIONAL — delete the whole section for a linear plan; no section = depends on the previous phase (v1 behavior).
+     Depends on: the phases that must land first ("none" allowed). /ps-dormammu builds the waves from this.
+     A dependency is satisfied only when its phase is done AND landed on main (or built earlier in the same run) —
+     so depending on a phase another run is still building parks this one until that run ships.
+     Surface: the files/dirs this phase owns (globs). Two phases run in parallel only when both declare surfaces and they're disjoint. -->
+- Depends on: <!-- e.g. 02, 03 — or none -->
+- Surface: <!-- e.g. src/ingest/**, tests/ingest/** -->
+
 ## Requirements
 <!-- What the phase must do, specifically. Leave [OPEN: ...] markers where undecided — don't guess. -->
 -
 
 ## Acceptance criteria
-<!-- This phase's checklist. Each becomes a test. Mark: [ ] todo, [x] done, [!] failing. Prefer verifiable: "ingest returns 900 rows with no null symbol" beats "works well". -->
+<!-- This phase's checklist. Each becomes a test. Mark: [ ] todo, [x] done, [!] failing. Prefer verifiable: "ingest returns 900 rows with no null symbol" beats "works well". UI-facing criteria name their Playwright check the way backend criteria name their pytest. -->
 - [ ]
 - [ ]
+
+## Performance budget
+<!-- OPTIONAL — delete if this phase has none. Budgets are acceptance criteria: each becomes a failing benchmark test (pytest-benchmark, hyperfine) before any code, like every other criterion. Numbers, not adjectives. -->
+-
 
 ## Hardstop / kill criteria
 <!-- When to stop this phase and escalate instead of pushing on: a blocker that needs me, a missing dependency, or a sign it's the wrong bet. /ps-dormammu obeys these. -->

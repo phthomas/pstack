@@ -1,48 +1,61 @@
 ---
 name: ps-dormammu
 description: >
-  pstack: autonomous build — walk phases unattended: tests, build, QA,
-  fresh-context review, commit, per phase. Use when I type /ps-dormammu, or say
-  "dormammu", "dormammu magic", "build the whole thing", "build phase 3
-  autonomously", "run it overnight", or "I'm out of time, build it all". Scope
-  is the argument: nothing = every remaining phase, "mvp" = the MVP phases, a
-  number or range = those phases; any text after the scope is binding steering
-  context. Never merges — shipping stays mine via /ps-close.
+  pstack: autonomous build — a thin conductor walks phases unattended, one
+  fresh-context builder per phase, in dependency waves, parallel where the
+  specs allow: tests red, build green, mechanical gate, review panel, commit,
+  per phase. Use when I type /ps-dormammu, or say "dormammu", "dormammu
+  magic", "build the whole thing", "build phase 3 autonomously", "run it
+  overnight", "build 4 and 5 in parallel", or "I'm out of time, build it all".
+  Scope is the argument: nothing = every remaining phase, "mvp" = the MVP
+  phases, a number or range = those phases; `--parallel` allows concurrent
+  phases in worktrees where surfaces are disjoint; any other text is binding
+  steering context. Never merges to main — shipping stays mine via /ps-close.
 ---
 
 # Dormammu — autonomous build (one phase, the MVP, or everything)
 
 For when I'm not steering: build the phases in scope end to end and leave me a reviewed build plus a report, with only the merge decision left for me. This trades oversight for progress — the phase specs carry it. The guardrails below are not optional.
 
+**You are the conductor, not the builder.** Hold only the map (ROADMAP.md), the wave state, and the growing report. Each phase is built by a fresh-context worker you spawn (a subagent via the Task tool on Claude Code; a fresh session elsewhere) — late phases get the same clear head as early ones, and the run's context never silts up with earlier phases' diffs. No subagent mechanism at all? Run the loop yourself, but reload only the current phase's pack each time and keep the rest of the run out of your head.
+
 ## Scope
-- `/ps-dormammu` -> every phase in ROADMAP.md not yet done, in order.
-- `/ps-dormammu mvp` -> the MVP phases. `/ps-dormammu 3` / `/ps-dormammu 2-4` -> those phases.
-- Free text after the scope (`/ps-dormammu 3 reuse the ingest module; correctness over speed`) is binding steering context — fold it into how you build.
+- `/ps-dormammu` -> every phase in ROADMAP.md not yet done. `/ps-dormammu mvp` -> the MVP phases. `/ps-dormammu 3` / `/ps-dormammu 2-4` -> those phases.
+- `--parallel` -> phases in the same wave may run concurrently, each in its own worktree — only where every pair of Surfaces is declared and disjoint. Without the flag, waves still order the run but phases execute one at a time. When in doubt, sequential: parallelism is a speedup, not a goal.
+- Any other text after the scope (`/ps-dormammu 3 reuse the ingest module; correctness over speed`) is binding steering context — fold it into every builder's pack.
 
 ## Pre-flight (launch is the last attended moment — spend it)
-Sweep the in-scope specs for [OPEN: ...] markers and untestably vague criteria. If any exist, ask me ONCE, in one batch, each with a recommended default (AskUserQuestion on Claude Code; plain text elsewhere), and write the answers into the specs. If I say "just go", or I don't engage, triage each item instead:
-- Safe to assume — naming, formats, internal details, anything cheap to reverse -> take the most reasonable choice, record it in the spec marked "(assumed)", and continue.
-- Load-bearing — data sources, auth, external contracts, money, security, anything expensive to reverse -> treat it as that phase's hardstop: stop there and report rather than guess.
+1. Sweep the in-scope specs for [OPEN: ...] markers and untestably vague criteria. If any exist, ask me ONCE, in one batch, each with a recommended default (AskUserQuestion on Claude Code; plain text elsewhere), and write the answers into the specs. Builders can't ask mid-run — this batch is why. If I say "just go", or I don't engage, triage each item instead:
+   - Safe to assume — naming, formats, internal details, anything cheap to reverse -> take the most reasonable choice, record it in the spec marked "(assumed)", and continue.
+   - Load-bearing — data sources, auth, external contracts, money, security, anything expensive to reverse -> treat it as that phase's hardstop: stop there and report rather than guess.
+2. Resolve capabilities: read CLAUDE.md `## Capabilities` (probe as /ps-doctor does if it's missing or stale). Note what this run has — reviewers, parsimony, docs, browser, gate tools — and what degrades; it becomes each phase's manifest line.
+3. Compute the waves from the specs' `Depends on:` lines, topologically. A spec with no Coordination block depends on the previous phase — no blocks anywhere means a linear run, exactly as v1. **A dependency counts as satisfied only when its phase is done AND landed on main, or built earlier in this same run.**
+4. Other runs: check `git worktree list` and branches matching `ps/*`. If this tree already hosts a live run, move yourself to a sibling worktree off main first (as /ps-start does) — one tree, one run. Phases depending on another run's unlanded work, or whose Surface overlaps an active run's claimed surfaces (read its branch's ROADMAP and specs), get parked as blocked-by-that-run: reported, not built, not counted as failures. Their descendants park with them; everything else proceeds.
+5. If `ecc-plan-canvas` is on PATH and I'm still at the keyboard, offer the in-scope specs in the canvas for a last annotated look; otherwise the typed pre-flight was the gate.
 
 ## Hard guardrails (never break these, even unattended)
-- One feature branch for the run: reuse the current branch if it's already a dedicated feature branch, otherwise cut a fresh one off main. NEVER work on or commit to main.
-- NEVER merge, deploy, push to prod, or touch production systems or secrets.
+- One feature branch for the run, named `ps/<slug>` (a short slug from the scope — `ps/alerts`, `ps/mvp-0729`): reuse the current branch if it's already a dedicated feature branch, otherwise cut a fresh one off main. NEVER work on or commit to main.
+- Worktrees are run-branch discipline: each parallel phase gets a worktree on a child branch (`ps/<slug>/NN`) cut from the run branch; children merge only back into the run branch and are pruned after. Nothing ever merges to main.
+- NEVER merge to main, deploy, push to prod, or touch production systems or secrets.
 - NEVER run destructive or irreversible commands: no force-push, no history rewrites, no deleting work that isn't yours.
 - Commit per phase with clear messages, so I can review and bisect in the morning.
-- Shipping stays mine: you build, QA, and review; I make the merge call with /ps-close.
+- Shipping stays mine: you build, gate, and review; I make the merge call with /ps-close.
 
-## The loop, per phase in ROADMAP order
+## The loop, per wave
+Take the next wave. For each phase in it (concurrently only under the `--parallel` conditions above), spawn a builder with a curated pack — the phase's spec, CLAUDE.md, PRODUCT.md's vision in a paragraph, the steering context, the ADRs that touch this phase, and the parsimony bar (ponytail if installed) — and these instructions:
+
 1. Set the phase to in progress in ROADMAP.md.
-2. Tests from criteria: if the phase's acceptance criteria aren't covered yet, write one test per checkable criterion (in CLAUDE.md's framework, named so the criterion is obvious) and run them red — that red is the build target. If the phase touches existing code with thin coverage, first add characterization tests around the seams you're about to change, so regressions have something to trip.
-3. Build to green, incrementally, per CLAUDE.md's conventions and the readability bar; build only what the phase asks. Don't pause for steering.
-4. QA loop (correctness): run the full suite; hunt bugs, missing edge cases, and unmet criteria; add a regression test for each real issue; fix; re-run — until the criteria pass and a QA pass surfaces nothing material. Cap it at ~3-5 loops.
-5. Review pass (quality), IN FRESH CONTEXT: a subagent or fresh session, so the reviewer isn't anchored on code it just wrote. The bar: simplicity (simplest thing that works, YAGNI), readability (clear in one pass), deletability (no dead code or needless layers), consistency (matches CLAUDE.md). Apply the clear must-fix simplifications and re-run the tests; note debatable judgment calls for the report rather than forcing them.
-6. Tick the phase's criteria in its spec, set it done in ROADMAP.md, update STATE.md, commit.
-7. Advance. Stop when scope is done or a stop condition trips.
+2. Tests from criteria: if the phase's acceptance criteria aren't covered yet, write one test per checkable criterion (in CLAUDE.md's framework, named so the criterion is obvious) and run them red — that red is the build target. A performance budget is a criterion: write the failing benchmark. A UI criterion is a criterion: write the Playwright check. If the phase touches existing code with thin coverage, first add characterization tests around the seams you're about to change, so regressions have something to trip.
+3. Build to green, incrementally, per CLAUDE.md's conventions and the readability bar; build only what the phase asks. When an API belongs to a fast-moving library, climb the docs ladder — installed source first (version-exact), then official docs via websearch + webfetch — rather than memory. Don't pause for steering — there's no one to steer.
+4. Gate loop, machine first: formatter, strict typecheck, the phase-scoped tests, the budgets — fix and repeat until clean, adding a regression test for each real bug. Run the FULL suite once at the end of the phase, not every iteration. Cap the hunt at ~3-5 loops.
+5. Panel: run /ps-review on the phase diff — correctness per surface, parsimony, product (browser eyes if the capability is there), security if triggered, all fresh-context. Fix the must-fixes, re-gate, re-review the deltas — at most 3 cycles, then park the phase with its findings flagged. Arbitration is /ps-review's rule: the spec is the objective function; parsimony wins ties.
+6. Tick the phase's criteria in its spec, set it done in ROADMAP.md, commit on the phase's branch, and return the phase result: criteria status, commits, assumptions marked "(assumed)", the panel's manifest line, flags.
+
+Then close the wave: merge its phase branches into the run branch in phase order; run the full suite once as the integration gate — a red integration gate is a failed wave: stop and report rather than patch blind; prune the worktrees; fold the phase results into the report; advance to the next wave.
 
 ## Stop conditions (don't thrash, don't burn the night)
-- Scope done: every phase in scope passes QA and review.
-- A phase fails hard: it can't be made to pass, or hits its hardstop — including a load-bearing open question the pre-flight couldn't settle. Stop there; don't build later phases on a broken foundation.
+- Scope done: every phase in scope passed its gate and its panel.
+- A phase fails hard: it can't be made to pass, hits its hardstop — including a load-bearing open question the pre-flight couldn't settle — or parks at the review cap. Its DESCENDANTS don't build; independent phases in scope still may.
 - No progress: the same failures keep recurring — stop rather than churn.
 - A wall that needs me: anything that would require breaking a guardrail. Never break one to proceed.
 
@@ -50,5 +63,5 @@ Sweep the in-scope specs for [OPEN: ...] markers and untestably vague criteria. 
 When you stop, leave me:
 - ROADMAP.md and the specs updated to reality: statuses and ticked criteria reflect what's actually true.
 - STATE.md overwritten with the handoff (use /ps-checkpoint's structure): how far you got, where you stopped, what's next.
-- A short report over every phase attempted: what got built; which criteria pass and which don't; what QA found and fixed; what the fresh-context review applied vs flagged for me; every assumption you made on your own (suggest /ps-adr where it matters); known issues and risks.
+- A short report over every phase attempted: what got built; which criteria pass and which don't; what the gate caught; what the panel applied vs flagged — including anything parked at the review cap or blocked by another run, with its findings; every assumption made unattended (suggest /ps-adr where it matters); known issues and risks; and the phase's manifest line — which judges ran with which providers, what degraded and why. Plus one line for the run: the waves as executed, parallel or not.
 - Everything on the run branch, unmerged. Then it's my turn: read the report, deep-QA the flags, and /ps-close to ship — or /ps-spec more clarity into a phase and run you again.

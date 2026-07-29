@@ -24,6 +24,16 @@ Then continue from the briefing's next action. `[OPEN: ...]` markers in the acti
 - One phase = one branch = one PR; a multi-phase `/ps-dormammu` run rides one run branch, committed per phase. Acceptance criteria become tests — the build skills write them, red first.
 - Stack-specific conventions go here — e.g. Python: prefer Polars over pandas, type hints on public functions; Go: idiomatic error handling, no needless interfaces; etc.
 
+## Capabilities
+<!-- Capability -> provider -> fallback. The one place providers are named: /ps-review, /ps-build, and /ps-dormammu resolve against this and degrade gracefully — never silently. /ps-start writes it from a probe of the real environment; /ps-doctor re-syncs it. Edit to match yours. -->
+- correctness-review: <!-- e.g. ecc python-reviewer + fastapi-reviewer --> | fallback: inline bar (ps-review)
+- parsimony-review: <!-- e.g. ponytail-review --> | fallback: inline bar (ps-review)
+- product-review: built-in (ps-review) — no provider exists; this one is ours
+- docs: installed source (venv / node_modules, version-exact) -> official docs via websearch + webfetch <!-- optional: a docs CLI as convenience --> | fallback: training knowledge, flag unverified calls
+- browser: <!-- e.g. chrome-devtools MCP (frontend projects only) --> | fallback: Playwright artifacts
+- gate: <!-- e.g. ruff · pyright --strict · pytest (+pytest-benchmark, hypothesis) -->
+- canvas: <!-- ecc-plan-canvas if installed --> | fallback: typed confirm
+
 ## Always / never
 - Always write a regression test for every bug you fix.
 - Always record significant or architectural decisions with `/ps-adr`.

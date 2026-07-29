@@ -1,0 +1,32 @@
+# Changelog
+
+## 2.1.0 — the continuity release
+
+Products get fed, not finished — and sometimes fed twice at once. 2.1 gives runs identity and makes both continuity scenarios first-class (ADR 0004).
+
+- **Named dumps** — `/ps-start dump2.md` (any path); several queued dump files and no argument, it asks which. A processed dump is spent: the specs are the record; delete or archive it.
+- **Extend from reality** — extend mode now reads STATE.md and recent git history alongside PRODUCT/ROADMAP, so new phases start from what's actually mid-flight and shipped, not just the old plan.
+- **Concurrent runs** — one working tree, one run: a second `/ps-start` or `/ps-dormammu` moves itself to a sibling worktree off main (`ps/<slug>` branches; git is the registry — no state file). Planning reads the active run's branch for its claimed phases and Surfaces and shapes the new phases around them.
+- **Cross-run blocking for free** — a `Depends on:` is satisfied only when its phase is done AND landed on main (or earlier in the same run). Phases needing another run's unlanded work — or overlapping its claimed surfaces — park as blocked-by-that-run, with their descendants; the rest build.
+- **Land order** — `/ps-close` merges main into the run branch before the panel when another run landed first: ROADMAP reconciles as a union of rows (each run authoritative for its own phases), STATE.md is regenerated rather than merged, the full suite re-runs, and the close notes which parked phases just unblocked.
+- **Guards and visibility** — ROADMAP is append-only while any run is live (`/ps-spec` refuses renumbering and under-the-feet revisions); `/ps-resume` briefs on other live runs, their claims, and what they block.
+
+## 2.0.0 — the execution release
+
+v1 collapsed the ambiguity before the build; 2.0 upgrades the build itself. pstack stays pure markdown — everything with a runtime is a *capability provider* the skills detect, use, and degrade without (visibly, never silently).
+
+### New skills
+- **`/ps-review`** — the review panel: independent fresh-context judges over the diff — correctness per surface, parsimony (over-engineering), **product** (built vs specced, against PRODUCT.md and the phase criteria; browser eyes on UI phases when available), security when triggered. Must-fix / worth-considering / skip-it; the spec is the objective function, parsimony wins ties; every report ends with a provider manifest line.
+- **`/ps-doctor`** — probe the environment, print the capability manifest with an install hint per gap, and sync CLAUDE.md's `## Capabilities` map.
+
+### Changed
+- **`/ps-dormammu`** — rebuilt as a thin conductor: one fresh-context builder per phase (late phases get a clear head; the run's context never silts up); dependency **waves** from the specs' `Depends on:` lines; `--parallel` runs a wave's phases in worktrees when their `Surface:` declarations are disjoint; a failed phase blocks only its descendants; the wave merges into the run branch in order behind a full-suite integration gate. Review step is now the `/ps-review` panel, capped at 3 fix cycles before parking. The morning report gains per-phase manifest lines and the wave summary. Guardrails unchanged — one run branch, never merge to main, commit per phase, shipping stays yours.
+- **Docs grounding is a ladder, not an MCP** — the build skills ground fast-moving library APIs by reading the *installed source* first (venv / `node_modules`, version-exact by construction), then official docs via the harness's websearch + webfetch; docs CLIs are optional convenience. No third-party registry sits in the default path — no version drift, no always-on injection surface, no tool-schema tax (ADR 0003).
+- **`/ps-build`** — reads the Capabilities map; performance budgets and UI criteria become red tests like everything else; adds the **mechanical gate** (formatter, strict typecheck, phase-scoped tests, benchmarks) before any review attention; offers the panel at phase end.
+- **`/ps-close`** — the review step now runs the `/ps-review` panel over everything being closed; verification runs budgets too.
+- **`/ps-start`** — interviews for phase independence (`Depends on:` + `Surface:`) and numeric performance budgets where the dump implies them (both optional); generates CLAUDE.md's `## Capabilities` section from a real probe of the environment; shows drafts in the plan canvas when `ecc-plan-canvas` is installed.
+- **`specs/_TEMPLATE.md`** — optional `## Coordination` (Depends on / Surface) and `## Performance budget` sections; UI criteria name their Playwright check.
+- **`/ps-spec`**, **`/ps-resume`**, **`dump.md`**, reference **`CLAUDE.md`** — consistency touches (renumbering updates `Depends on:` references; resumes surface parked phases; dumps invite numeric perf targets; the Capabilities template block).
+
+### Migration from 1.x
+None required. v1 projects run unchanged: specs without Coordination blocks build linearly (v1 behavior); with no providers installed, the panel's judges use their inline bars — which are v1's review bars. Add structure and providers only where they pay. Recommended after upgrading: run `/ps-doctor` once per machine, and let `/ps-start` (extend mode) or `/ps-doctor` add the `## Capabilities` map to existing projects' CLAUDE.md.
