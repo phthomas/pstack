@@ -50,7 +50,7 @@ New session, cold context. Rehydrate before touching anything:
   Next action: deep-QA the flagged item, then /ps-close.
 > /ps-close
 → Criteria verified against the tests; diff reviewed (complete + clean);
-  1 must-fix applied; ADR recorded for the DuckDB choice; STATE.md written.
+  1 must-fix applied; ADR recorded for the DuckDB choice (docs/adr/_EXAMPLE-use-duckdb-for-analytics.md); STATE.md written.
   Merged through 02's commit; 03 stays on the branch, waiting on the credential.
 ```
 You hand over the credential, then `/ps-dormammu 3` finishes the product.

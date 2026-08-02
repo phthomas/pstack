@@ -1,8 +1,8 @@
 # PSTACK.md — how to drive pstack
 
-> The activity map: ten skills, one flow. New here? `EXAMPLE.md` is a worked walkthrough from a dump to a built product.
+> The activity map: eleven skills, one flow. New here? `EXAMPLE.md` is a worked walkthrough from a dump to a built product.
 
-pstack wraps one workflow: braindump -> specced product -> built product, with shipping always yours. Ten skills, `ps-` prefixed; three of them do most of the work.
+pstack wraps one workflow: braindump -> specced product -> built product, with shipping always yours. Eleven skills, `ps-` prefixed; three of them do most of the work.
 
 ## The happy path
 1. **Braindump into `dump.md`** — three loose headings, no structure required. Dictate if you can. Messy is the intended input.
@@ -20,6 +20,7 @@ pstack wraps one workflow: braindump -> specced product -> built product, with s
 - Start: `/ps-resume` — reads ROADMAP.md, the active spec, STATE.md, and git; runs the tests; briefs you (parked phases included) and proposes the next action. If STATE.md and reality disagree, it trusts git and the tests.
 - Stop: `/ps-checkpoint` — overwrites STATE.md with the handoff. (`/ps-close` and `/ps-dormammu` run it themselves.)
 - Occasionally: `/ps-doctor` — probe the environment, print the capability manifest, re-sync CLAUDE.md's map. Run it after installing a provider, or when a panel manifest line surprises you.
+- After anything happened outside the skills (manual commits, another agent, a long gap): `/ps-init` — audits every doc against code, git, and the tests; reports the drift, repairs the mechanical items on one confirmation, and raises the judgment calls one by one. Reality wins; docs get corrected. (A bare repo with no docs is /ps-start's job, not init's.)
 
 ## Changing the plan
 - Fits in a sentence -> just say it: "add a phase for X", "re-open phase 2", "reorganize the order", "this approach isn't working". `/ps-spec` catches it — keeps ROADMAP.md, specs/ (Coordination references included), and BACKLOG.md consistent, and records an ADR when the change is directional.
@@ -32,7 +33,7 @@ pstack wraps one workflow: braindump -> specced product -> built product, with s
 - **Tests are not a step.** Each build gear turns the phase's acceptance criteria into red tests before implementing — performance budgets become failing benchmarks, UI criteria become Playwright checks. "Done" stays executable; you never schedule it.
 - **Measurement over exhortation.** Wherever "write good code" could become a machine check (the gate) or an independent fresh-context verdict (the panel), it did. Advice-in-context is the weakest tool in the box; it's reserved for what can't be measured.
 - **Capabilities live in the environment, never in the core.** The skills are markdown; reviewers, docs lookup, browser, canvas are providers, named once in CLAUDE.md's `## Capabilities` and resolved at runtime. A missing provider degrades a judge to its inline bar — visibly, in the manifest line, never silently.
-- **No skill where a sentence works.** An architecture sanity-check, doc grooming — just ask. A skill exists only where there's a gate to enforce (/ps-start, /ps-close), a guardrail to hold unattended (/ps-dormammu), a verdict to keep independent (/ps-review), file mechanics to keep consistent (/ps-spec, /ps-adr, /ps-checkpoint, /ps-resume), or an environment to make visible (/ps-doctor).
+- **No skill where a sentence works.** An architecture sanity-check, doc grooming — just ask. A skill exists only where there's a gate to enforce (/ps-start, /ps-close), a guardrail to hold unattended (/ps-dormammu), a verdict to keep independent (/ps-review), file mechanics to keep consistent (/ps-spec, /ps-adr, /ps-checkpoint, /ps-resume, /ps-init), or an environment to make visible (/ps-doctor).
 
 ## More than one thing at once
 - **Named dumps queue ideas**: `/ps-start dump-<topic>.md` — any file; a processed dump is spent, the specs are the record.
@@ -43,6 +44,7 @@ pstack wraps one workflow: braindump -> specced product -> built product, with s
 - A detail inside a phase -> say it while building; the spec gets updated as you steer.
 - A phase's goal, order, or existence -> `/ps-spec`: re-scope, re-open, reorder, or park it in BACKLOG.md.
 - The product direction or architecture -> `/ps-adr` the why, update PRODUCT.md / CLAUDE.md, then `/ps-spec` the new phases.
+- The docs and the code disagree (work happened outside the skills) -> `/ps-init`: audit everything against git and the tests, repair with your sign-off.
 - A judge keeps degrading -> `/ps-doctor` and install (or consciously skip) the provider.
 - A different product -> new repo.
 
@@ -53,9 +55,10 @@ pstack wraps one workflow: braindump -> specced product -> built product, with s
 - `ROADMAP.md` — the product map: every phase, its status, and a link to its spec. `/ps-dormammu` walks it, in waves.
 - `specs/NN-*.md` — one per phase: the contract (requirements, acceptance-criteria checklist, optional Coordination and Performance budget, hardstop). `[OPEN: ...]` markers welcome until the phase builds.
 - `STATE.md` — where we are, next steps (per-session; the autonomous runs update it as they go).
-- `docs/adr/` — decisions, append-only. `tests/` — enforced acceptance criteria. `BACKLOG.md` — parked tangents.
+- `docs/adr/` — decisions, append-only. `tests/` — enforced acceptance criteria. `BACKLOG.md` — parked tangents. `CONTEXT.md` — the glossary, grown as domain vocabulary emerges.
 
 ## Notes
+- Craft is borrowed, process is owned: builders' model-invoked moves (prototype, bug diagnosis, merge-conflict technique) come from providers named in the Capabilities map; pstack marks the moments (`[OPEN-SPIKE: ...]`) and routes the captures into its own artifacts via CLAUDE.md standing rules. Two of the upstream skills stay out — their `tdd` and `code-review` collide with ps-build's loop and ps-review's panel.
 - Steer any skill by pre-answering in the invocation: `/ps-dormammu 3-5 --parallel use DuckDB for storage; correctness over speed`.
 - Calibrate: trivial fixes skip the pipeline entirely. The flow is for non-trivial, shippable work.
 - The skills compose through files only (ROADMAP.md, specs/, STATE.md, tests/, git) — no hidden state. Stop, inspect, or re-run at any point.

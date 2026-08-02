@@ -1,8 +1,9 @@
 #!/usr/bin/env sh
-# Sync the canonical Claude Code skills into the Codex skills tree.
+# Sync the canonical Claude Code skills into the shared agents tree.
 #
 # .claude/skills/ is canonical; .agents/skills/ is generated from it so the
-# same ps-* SKILL.md files run on both agents. Re-run after editing any skill.
+# same ps-* SKILL.md files run on Codex and pi. OpenCode and oh-my-pi read
+# both trees natively — no tree of their own. Re-run after editing any skill.
 set -eu
 
 root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)

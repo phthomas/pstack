@@ -2,7 +2,7 @@
 
 > An opinionated agent workflow for turning a brain dump into a shipped product.
 
-pstack is a set of ten [Claude Code](https://docs.claude.com/en/docs/claude-code) skills (all prefixed `ps-`) plus a few document templates — and because they use the shared `SKILL.md` format, they run on [Codex](https://developers.openai.com/codex), [pi](https://pi.dev), and [oh-my-pi](https://omp.sh) too. It wraps one workflow: **get the product clear, then build it** — by hand a piece at a time, or unattended end to end while you sleep. Point it at a blank slate, a codebase that already exists, or a live pstack project you're feeding new ideas — the same front door fits all three.
+pstack is a set of eleven [Claude Code](https://docs.claude.com/en/docs/claude-code) skills (all prefixed `ps-`) plus a few document templates — and because they use the shared `SKILL.md` format, they run on [Codex](https://developers.openai.com/codex), [OpenCode](https://opencode.ai), [pi](https://pi.dev), and [oh-my-pi](https://omp.sh) too. It wraps one workflow: **get the product clear, then build it** — by hand a piece at a time, or unattended end to end while you sleep. Point it at a blank slate, a codebase that already exists, or a live pstack project you're feeding new ideas — the same front door fits all three.
 
 It exists because the bottleneck in building with an AI agent usually isn't the coding — the agent can code. It's the ambiguity between *"I have an idea"* and *"the agent knows exactly what to build."* pstack is machinery for collapsing that ambiguity, starting from the messiest possible input: a brain dump.
 
@@ -13,11 +13,11 @@ Want the reasoning? Read [WHY.md](./WHY.md). Just want to use it? Keep going.
 ## Is this for you?
 
 It fits if you:
-- use Claude Code, Codex, pi, or oh-my-pi,
+- use Claude Code, Codex, OpenCode, pi, or oh-my-pi,
 - have more ideas than time, and think by dumping them out rather than writing clean specs,
 - are happy to adopt an opinionated workflow instead of assembling your own.
 
-It's probably *not* for you if you want a neutral, unopinionated framework, or you're on an agent that doesn't read `SKILL.md` (today: Claude Code, Codex, pi, oh-my-pi). This is my workflow, shared — not a product.
+It's probably *not* for you if you want a neutral, unopinionated framework, or you're on an agent that doesn't read `SKILL.md` (today: Claude Code, Codex, OpenCode, pi, oh-my-pi). This is my workflow, shared — not a product.
 
 ## The idea in 30 seconds
 
@@ -35,7 +35,7 @@ Three layers. Only the first is required — everything after it is a provider p
 
 ### Layer 0 — the skills (required)
 
-pstack is really just the ten `ps-` skills plus a workflow; the same `SKILL.md` files serve all four agents.
+pstack is really just the eleven `ps-` skills plus a workflow; the same `SKILL.md` files serve all five agents — every supported agent reads one of the repo's two identical trees.
 
 **Claude Code** — skills live in `.claude/skills/`:
 
@@ -55,6 +55,8 @@ cp -r path/to/pstack/.agents/skills/ps-* ~/.agents/skills/             # every u
 
 Restart Codex; the skills trigger by description or as slash commands. (Codex skill paths have shifted across versions — if `.agents/skills` isn't picked up, check your version's docs, e.g. `~/.codex/skills`.)
 
+**OpenCode** — needs no tree of its own: it reads `.claude/skills/` and `.agents/skills/` natively, at both project level and home level (`~/.claude/skills/`, `~/.agents/skills/`, or its own `~/.config/opencode/skills/`). Either copy above covers it; no extra step. pstack's `AGENTS.md` bridge gives it the project context too.
+
 **pi** — reads the same tree Codex does: `.agents/skills/` in the project, or `~/.agents/skills/` globally. The Codex copy above covers it; no extra step.
 
 **oh-my-pi (omp)** — inherits skills, rules, and `AGENTS.md` straight from `.claude/` and `.agents/` on first run. Install for either agent above and omp picks them up.
@@ -70,6 +72,26 @@ Global, one-time installs. pstack works without any of them — `/ps-review`'s j
 | Correctness + security review | [ECC](https://github.com/affaan-m/ECC) reviewer agents (python, fastapi, react, typescript, code, security) | `git clone https://github.com/affaan-m/ECC && cd ECC && npm install && ./install.sh --profile minimal --target claude` — the manual installer; agents land in `~/.claude/agents/`. Skip the plugin route (it can't ship rules and stacks badly). |
 | Parsimony review | [Ponytail](https://github.com/DietrichGebert/ponytail) (`ponytail` + `/ponytail-review`) | `npx -y skills add DietrichGebert/ponytail` — plain skill files, no runtime. |
 | Plan canvas | `ecc-plan-canvas` (annotate-in-browser review at the gates) | `npm i -g ecc-universal` — needs node; serves on `127.0.0.1:4517`. |
+| Craft (builders' model-invoked moves) | [mattpocock/skills](https://github.com/mattpocock/skills) subset: `prototype`, `diagnosing-bugs`, `resolving-merge-conflicts`, `domain-modeling`, `research` | Selective install — see [Installing craft](#installing-craft-bring-only-the-subset) below. Never `npx skills add mattpocock/skills` bare: the full repo includes `tdd` and `code-review`, which collide with ps-build's loop and ps-review's panel. |
+
+#### Installing craft: bring only the subset
+
+2.2's one new dependency is the craft provider, and the rule is **install by name, never by repo** — the skills you don't list never land, so there's nothing to remember to remove:
+
+```bash
+npx skills add mattpocock/skills \
+  --skill prototype \
+  --skill diagnosing-bugs \
+  --skill resolving-merge-conflicts \
+  --skill domain-modeling \
+  --skill research
+```
+
+- Add `-g` to install globally instead of into the current project.
+- Multi-agent: add `-a claude-code -a codex -a opencode` to install the same subset for each agent's tree in one command (the CLI knows each agent's directory).
+- **Deliberately excluded, don't add them:** `tdd` and `code-review` collide with ps-build's red-first loop and ps-review's fresh-context panel; `wayfinder`/`to-tickets`/`triage` assume an issue tracker as the source of truth, and pstack's truth is ROADMAP.md + specs (ADR 0005). If a later resync drags `tdd` or `code-review` back in as model-invocable, `/ps-doctor` flags it.
+- Copies are frozen at install; resync upstream changes as a reviewed diff (re-run the same command and inspect). Adaptations — e.g. where prototype captures land — live in your CLAUDE.md standing rules, never in the provider files, so resyncs stay clean.
+- Installing nothing is fine: without the craft capability, `[OPEN-SPIKE: ...]` markers degrade to ordinary `[OPEN: ...]` questions, visibly.
 
 ### Layer 2 — per project
 
@@ -120,7 +142,7 @@ Both gears write the tests themselves from each phase's acceptance criteria — 
 
 Both gears stop at `/ps-close` — verify the criteria against the tests, run the panel over the whole diff, record ADRs, checkpoint, merge. **Shipping is always your call.**
 
-**Every session:** `/ps-resume` to load (docs + git + tests -> a briefing and the next action), `/ps-checkpoint` to save the handoff. **Now and then:** `/ps-doctor` when the environment changed or a manifest line surprises you.
+**Every session:** `/ps-resume` to load (docs + git + tests -> a briefing and the next action), `/ps-checkpoint` to save the handoff. **Now and then:** `/ps-doctor` when the environment changed or a manifest line surprises you; `/ps-init` when work happened *outside* the skills (manual commits, another agent, a long gap) — it audits every doc against code, git, and the tests, then repairs the drift with your sign-off. Reality wins; the docs get corrected, never the other way around.
 
 **Change the plan:** just say it — "re-open phase 2", "this isn't working", "add a phase for X" — and `/ps-spec` catches it. A pile of new ideas? Dump again and re-run `/ps-start`.
 
@@ -135,13 +157,15 @@ Full activity map: [PSTACK.md](./PSTACK.md). Worked example, dump to build: [EXA
 - `ROADMAP.md` — the product map: every phase, its status, a link to its spec.
 - `specs/NN-*.md` — one contract per phase: requirements, acceptance-criteria checklist, optional Coordination (depends-on + surface) and Performance budget, hardstop. `[OPEN: ...]` markers welcome until the phase builds.
 - `STATE.md` — where you are, next steps (the session handoff).
-- `docs/adr/` — architectural decisions, append-only. `tests/` — the executable definition of done. `BACKLOG.md` — parked tangents.
+- `docs/adr/` — architectural decisions, append-only. `tests/` — the executable definition of done. `BACKLOG.md` — parked tangents. `CONTEXT.md` — the glossary (ubiquitous language, `_Avoid_:` synonym bans), grown by the interview as domain vocabulary emerges; craft skills that read CONTEXT.md pick it up for free.
 
 ## What's new in 2.x (and migrating from 1.x)
 
 **2.0** — two new skills (`/ps-review`, `/ps-doctor`), and the build gears rebuilt around four ideas: **fresh context per phase** (a thin conductor spawns one builder per phase, so hour six is as sharp as hour one), **waves** (specs may declare `Depends on:` + `Surface:`; independent phases can run in parallel worktrees under `--parallel`, and a failed phase blocks only its descendants), **the mechanical gate** (formatter/typecheck/tests/benchmarks loop before any review), and **the panel** (independent judges replace the single fresh-context review — including a product judge nothing else ships: built vs specced, against PRODUCT.md itself).
 
 **2.1** — continuity: named dumps (`/ps-start dump2.md`), extend-mode planning from reality (STATE.md + git, not just the roadmap), and concurrent runs — one working tree per run, sibling worktrees off main, `ps/<slug>` branches with git itself as the registry, cross-run blocking via one rule (a dependency is satisfied only when its phase has landed on main), and one-at-a-time landing at `/ps-close`. See CHANGELOG.md and ADR 0004.
+
+**2.2** — the craft tier: builders gain model-invoked *moves*, borrowed rather than built (ADR 0005) — a curated mattpocock/skills subset (`prototype`, `diagnosing-bugs`, `resolving-merge-conflicts`, `domain-modeling`, `research`) named in the Capabilities map, invoked by builders when the situation matches. Specs can mark `[OPEN-SPIKE: ...]` questions for the prototype skill to answer instead of the human; captures land in pstack artifacts via a CLAUDE.md standing rule; `CONTEXT.md` becomes the glossary artifact. Process is owned, craft is borrowed: pstack marks the moments, providers supply the moves. Also new: `/ps-init` (audit and realign the docs with the code — see above), and first-class OpenCode support (it reads pstack's existing skill trees natively).
 
 Migration is a no-op: v1 projects run unchanged. The new spec sections are optional — no Coordination blocks means a linear run, exactly v1's behavior; no providers installed means the panel judges use their inline bars, which are v1's review bars. Add structure and providers only where they pay.
 

@@ -32,7 +32,8 @@
 -
 
 ## Open questions
-<!-- [OPEN: ...] items for this phase. The build skills raise them when the phase starts: /ps-dormammu at pre-flight, /ps-build before coding. Empty is good. -->
+<!-- [OPEN: ...] items for this phase. The build skills raise them when the phase starts: /ps-dormammu at pre-flight, /ps-build before coding. Empty is good.
+     A question a throwaway prototype answers better than the human can — "does this state model feel right?", "which UI shape?" — gets [OPEN-SPIKE: ...] instead: the builder answers it with the prototype craft skill (no craft capability installed = treated as ordinary [OPEN: ...]). -->
 -
 
 ## Out of scope

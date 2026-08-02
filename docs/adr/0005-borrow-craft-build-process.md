@@ -1,0 +1,13 @@
+# 0005. Borrow craft, build process
+
+Status: accepted (2026-07-29)
+
+## Context
+2.0-2.1 built pstack's process column — gates, waves, panel, manifests, continuity — but left the craft column empty: builders had priors and judges, no *moves*. The mattpocock/skills repo supplies exactly that tier as model-invocable skills (prototype, diagnosing-bugs, resolving-merge-conflicts, domain-modeling, research), MIT-licensed and actively maintained, with an invocation taxonomy pstack agrees with: process is user-invoked, craft is model-invoked. Options: build pstack-native craft skills, or adopt his subset. Forces: craft content is undifferentiated commodity while pstack's moat is the control plane; pstack carries a no-maintenance promise against an upstream author with a large audience and active changesets; two of his model-invocable skills (`tdd`, `code-review`) collide with ps-build's loop and ps-review's panel; his prototype captures to "the implementation issue" while pstack's truth is files; his tracker-substrate planning skills (`wayfinder`, `to-tickets`, `triage`) would create a second source of truth; editable copies (skills.sh) permit local adaptation but complicate resync.
+
+## Decision
+Adopt the subset {prototype, diagnosing-bugs, resolving-merge-conflicts, domain-modeling, research} as a `craft` capability — providers, not core. Exclude `tdd` and `code-review` (collision) and the tracker-substrate skills (two-sources-of-truth). All adaptations live in pstack's layer, never in provider files: a CLAUDE.md standing rule routes prototype captures into pstack artifacts (verdict resolves the spec's open question; throwaway-branch pointer in the spec; architectural verdicts get an ADR); CONTEXT.md is adopted as pstack's glossary artifact, compatible with upstream skills that read it. pstack owns WHEN — `[OPEN-SPIKE: ...]` markers in specs, the builder-pack invocation line, manifest visibility — and the provider owns HOW. Copies are frozen at install; resync is a reviewed diff. Build-native tripwire: the day the standing-rule overrides for borrowed craft outgrow a page, fork or build.
+
+## Consequences
++ Builders gain a legitimate autonomous repertoire (spike a design question, run a real diagnosis loop) at ~fifteen lines of pstack change and zero new maintenance surface; the process/craft invocation split stays principled; upstream improvements arrive by diff.
+- Craft quality is coupled to upstream taste and churn; frozen copies drift until manually resynced; the two excluded skills must survive every resync (ps-doctor flags them if they reappear model-invocable); spikes in unattended runs rest on the provider's own fallback rules rather than pstack's. Revisit at the tripwire, or if upstream licensing or direction changes.

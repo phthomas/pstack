@@ -33,6 +33,11 @@ Then continue from the briefing's next action. `[OPEN: ...]` markers in the acti
 - browser: <!-- e.g. chrome-devtools MCP (frontend projects only) --> | fallback: Playwright artifacts
 - gate: <!-- e.g. ruff · pyright --strict · pytest (+pytest-benchmark, hypothesis) -->
 - canvas: <!-- ecc-plan-canvas if installed --> | fallback: typed confirm
+- craft: <!-- model-invocable moves for builders, e.g. prototype, diagnosing-bugs, resolving-merge-conflicts, domain-modeling, research (mattpocock/skills subset) --> | fallback: none — [OPEN-SPIKE: ...] markers degrade to ordinary [OPEN: ...]
+
+<!-- Standing rule that adapts borrowed craft skills to pstack's files-as-truth (they may default to an issue tracker):
+     prototype captures land in pstack artifacts — the verdict resolves the spec's open question, the throwaway-branch
+     pointer goes in the spec, and an architectural verdict gets an ADR. Adaptations live here, never in provider files. -->
 
 ## Always / never
 - Always write a regression test for every bug you fix.

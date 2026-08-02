@@ -1,4 +1,6 @@
-# 2. Use DuckDB for the analytics layer
+# Use DuckDB for the analytics layer (worked-example ADR)
+
+> This is the ADR from EXAMPLE.md's imaginary project, kept as a format exemplar — underscore-prefixed like specs/_TEMPLATE.md, so it is not part of pstack's real decision log. The number 2 stays retired; pstack's own decisions are 0001 and 0003 onward.
 
 Status: accepted (<!-- date -->)
 

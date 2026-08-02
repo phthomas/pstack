@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.2.0 — the craft release
+
+Builders gain *moves*, not just gates and judges — borrowed, not built (ADR 0005): process is user-invoked and owned; craft is model-invoked and provided.
+
+- **The `craft` capability** — a curated [mattpocock/skills](https://github.com/mattpocock/skills) subset (`prototype`, `diagnosing-bugs`, `resolving-merge-conflicts`, `domain-modeling`, `research`) named in CLAUDE.md's Capabilities map. Builders in /ps-build and /ps-dormammu invoke them when the situation matches; excluded: upstream `tdd` and `code-review` (they collide with ps-build's loop and ps-review's panel — /ps-doctor flags them if found model-invocable) and the tracker-substrate planners (`wayfinder`, `to-tickets`, `triage`).
+- **`[OPEN-SPIKE: ...]`** — a spec marker for questions a throwaway prototype answers better than the human ("does this state model feel right?"). Builders answer them with the prototype skill; dormammu's pre-flight leaves them alone (no craft installed = they degrade to ordinary `[OPEN: ...]`). Phase results and the morning report record spikes run (question -> verdict, throwaway-branch pointer).
+- **Adaptation in pstack's layer only** — a CLAUDE.md standing rule routes prototype captures into pstack artifacts (spec + ADR, not an issue tracker); provider files are never edited, so resyncs stay clean diffs.
+- **`CONTEXT.md`** — adopted as the glossary artifact (ubiquitous language with `_Avoid_:` synonym bans), grown by /ps-start's interview as domain vocabulary emerges; upstream skills that read CONTEXT.md get it for free.
+- **`/ps-init`** — the eleventh skill: audit and realign every pstack artifact (CLAUDE.md, PRODUCT.md, ROADMAP.md, specs/, STATE.md, ADRs, CONTEXT.md) against the codebase, git history, and tests. Detects greenfield / brownfield / live-pstack first; repairs mechanical drift on one confirmation, raises judgment calls one by one; ADRs stay append-only (contradictions become superseding ADRs, never edits). Repairs only — a bare repo hands off to /ps-start.
+- **Selective craft install** — the README now documents install-by-name (`npx skills add mattpocock/skills --skill prototype --skill ...`): the excluded skills never land, instead of landing and needing removal. Multi-agent via the CLI's `-a claude-code -a codex -a opencode` flags.
+- **OpenCode support** — OpenCode reads `.claude/skills/` and `.agents/skills/` natively (project and home level), so pstack's existing trees serve it with no extra step; documented alongside Codex, pi, and oh-my-pi.
+
 ## 2.1.0 — the continuity release
 
 Products get fed, not finished — and sometimes fed twice at once. 2.1 gives runs identity and makes both continuity scenarios first-class (ADR 0004).
