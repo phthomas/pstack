@@ -34,6 +34,10 @@ Then continue from the briefing's next action. `[OPEN: ...]` markers in the acti
 - gate: <!-- e.g. ruff · pyright --strict · pytest (+pytest-benchmark, hypothesis) -->
 - canvas: <!-- ecc-plan-canvas if installed --> | fallback: typed confirm
 - craft: <!-- model-invocable moves for builders, e.g. prototype, diagnosing-bugs, resolving-merge-conflicts, domain-modeling, research (mattpocock/skills subset) --> | fallback: none — [OPEN-SPIKE: ...] markers degrade to ordinary [OPEN: ...]
+- model-tiers: deep = session model · standard = <!-- e.g. sonnet --> · mechanical = <!-- e.g. haiku --> | fallback: everything on the session model
+  <!-- Tiers map task nature -> model, never role -> model: deep = design, judging, prose craft, security; standard = routine building
+       against a clear spec; mechanical = applying known fixes, recounts, delta re-checks. A failed agent retries once, one tier up;
+       the gate re-runs after mechanical work regardless. Only meaningful where the harness sets models per spawned agent. -->
 
 <!-- Standing rule that adapts borrowed craft skills to pstack's files-as-truth (they may default to an issue tracker):
      prototype captures land in pstack artifacts — the verdict resolves the spec's open question, the throwaway-branch

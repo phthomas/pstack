@@ -6,13 +6,16 @@
 <!-- One or two sentences: what this phase delivers and why. -->
 
 ## Coordination
-<!-- OPTIONAL — delete the whole section for a linear plan; no section = depends on the previous phase (v1 behavior).
+<!-- OPTIONAL — delete the whole section (or any line) you don't need; no section = depends on the previous phase,
+     default review weight and model tier (v1 behavior).
      Depends on: the phases that must land first ("none" allowed). /ps-dormammu builds the waves from this.
      A dependency is satisfied only when its phase is done AND landed on main (or built earlier in the same run) —
      so depending on a phase another run is still building parks this one until that run ships.
      Surface: the files/dirs this phase owns (globs). Two phases run in parallel only when both declare surfaces and they're disjoint. -->
 - Depends on: <!-- e.g. 02, 03 — or none -->
 - Surface: <!-- e.g. src/ingest/**, tests/ingest/** -->
+- Complexity: <!-- OPTIONAL: hard — the builder runs on the deep model tier when CLAUDE.md maps model-tiers; absent = standard. "hard" means design judgment, novel algorithms, or prose craft — not merely big. -->
+- Review: <!-- OPTIONAL: full — force the split review panel on this phase; absent = /ps-review's default weight (one combined judge). -->
 
 ## Requirements
 <!-- What the phase must do, specifically. Leave [OPEN: ...] markers where undecided — don't guess. -->

@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.3.0 — the proportionality release
+
+2.0 bought certainty at headcount prices; this release makes the ceremony proportional to the risk — and keeps agents alive on prose-heavy phases (ADR 0006). Born from a real run: 27 subagents and 5h38m for a five-phase MVP, seven agent deaths at the 64k output cap, all runaway thinking on prose work.
+
+- **Panel weight** — /ps-review now defaults to ONE combined fresh-context judge carrying all the bars in a single read of the diff; the split panel runs on triggers only: a security surface, a multi-surface diff, `Review: full` in the spec, a close over parked or flagged work, or the operator asking. Fresh context stays non-negotiable; headcount doesn't.
+- **Fixes return to the builder** — panel must-fixes resume the phase's builder (its context is still warm; SendMessage on Claude Code) or the conductor applies the trivially mechanical ones itself; a fresh fix agent is the last resort. The role that re-bought a phase's whole context to apply twelve known edits is gone. The panel is explicitly the conductor's step — a spawned builder can't spawn judges.
+- **Output discipline, in every pack** — spawned agents work file-by-file, never restate a whole file in prose or thinking, draft deliverables in the file with incremental edits, and tool-call early with at most a sentence or two between calls. An agent that still overflows gets resumed with smaller work units, never respawned from scratch. The morning report now accounts for deaths and resumes.
+- **`model-tiers`** — an optional Capabilities line mapping task nature -> model, never role -> model: deep (design, judging, prose craft, security) = the session model; standard (routine building against a clear spec); mechanical (known fixes, recounts, delta re-checks). Specs can mark `Complexity: hard`; a failed agent retries once one tier up; the gate re-runs after mechanical work regardless; manifest lines say which tier ran. No per-spawn model selection in the harness = everything on the session model, visibly.
+- **Lighter close** — /ps-close weighs its review by what already ran: every phase 0-must-fix under the run's panels -> one integrated judge over the final tree; parked or flagged work -> the full panel. /ps-dormammu no longer pre-runs any close review — the close panel is attended, and shipping stays the operator's.
+
 ## 2.2.0 — the craft release
 
 Builders gain *moves*, not just gates and judges — borrowed, not built (ADR 0005): process is user-invoked and owned; craft is model-invoked and provided.

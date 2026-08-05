@@ -6,7 +6,7 @@ pstack is a set of eleven [Claude Code](https://docs.claude.com/en/docs/claude-c
 
 It exists because the bottleneck in building with an AI agent usually isn't the coding — the agent can code. It's the ambiguity between *"I have an idea"* and *"the agent knows exactly what to build."* pstack is machinery for collapsing that ambiguity, starting from the messiest possible input: a brain dump.
 
-**2.0 adds the other half:** once the ambiguity is collapsed, pstack now also runs the *execution* well — fresh-context builders in dependency waves (parallel where the specs allow), a mechanical gate before any review, and a review panel of independent judges (correctness, over-engineering, built-vs-specced, security). pstack stays pure markdown; the panel's muscle comes from **capability providers** you install once and pstack detects — see [Providers](#layer-1--providers-optional-recommended).
+**2.x adds the other half:** once the ambiguity is collapsed, pstack also runs the *execution* well — fresh-context builders in dependency waves (parallel where the specs allow), a mechanical gate before any review, and a risk-weighted review panel of fresh-context judges (correctness, over-engineering, built-vs-specced, security — one combined judge by default, split when the diff earns it). pstack stays pure markdown; the panel's muscle comes from **capability providers** you install once and pstack detects — see [Providers](#layer-1--providers-optional-recommended) — and heavy models are spent only where judgment lives — see [Model selection](#model-selection--one-line-three-tiers).
 
 Want the reasoning? Read [WHY.md](./WHY.md). Just want to use it? Keep going.
 
@@ -108,6 +108,22 @@ npx skills add mattpocock/skills \
 
 Then run `/ps-doctor`: it prints the manifest (capability — provider — gap + install hint) and writes the `## Capabilities` map into CLAUDE.md so every skill resolves providers from one place.
 
+### Model selection — one line, three tiers
+
+Where the harness can pick a model per spawned agent (Claude Code's Task tool can; OpenCode's per-agent config can; a plain Codex session can't), the Capabilities map carries one more line, and the build skills route every spawn through it:
+
+```markdown
+- model-tiers: deep = session model · standard = sonnet · mechanical = haiku | fallback: everything on the session model
+```
+
+Tiers map **task nature -> model, never role -> model** — a "judge" can be forensic or a formality, a "builder" can be designing or transcribing, so roles are the wrong key:
+
+- **deep** — design judgment, independent verdicts, prose craft, anything security-touched. Anchored to the *session model* on purpose: whatever you launched with is the ceiling, the map only ever downgrades below it, and it can't go stale as model names churn. Launch on a cheaper model and the tiers collapse gracefully.
+- **standard** — routine building against a clear spec. Builders default here; a spec with `Complexity: hard` in its Coordination block promotes its builder to deep.
+- **mechanical** — applying already-decided fixes, recounts, delta re-checks. Work whose quality is guaranteed by the gate re-running afterwards, not by the model doing it.
+
+Classification will sometimes be wrong, so it's cheap to be wrong instead of forbidden: a failed or parked agent retries once, one tier up; security always runs deep; the mechanical gate re-runs after mechanical-tier work regardless; and every manifest line and morning report names the tier each agent ran on — the reports teach you the tuning. No `model-tiers` line, or no per-spawn selection in your harness: everything runs on the session model, visibly. Why this shape and not a config file or per-role routing: ADR 0006.
+
 The document templates in this repo (`PRODUCT.md`, `CLAUDE.md`, `ROADMAP.md`, `specs/_TEMPLATE.md`, `STATE.md`, …) show the artifacts the workflow maintains — you don't copy them in by hand; `/ps-start` writes the docs into your project from your dump, and `/ps-checkpoint` keeps `STATE.md` current. The one file you start with is your own `dump.md`.
 
 ## The workflow
@@ -138,9 +154,9 @@ Details still undecided become `[OPEN: ...]` markers in the specs — deliberate
 
 Both gears write the tests themselves from each phase's acceptance criteria — budgets and UI checks included; there is no separate test step. Both loop against the **mechanical gate** (formatter, strict typecheck, scoped tests, benchmarks) before any review attention is spent. `/ps-dormammu` opens with a pre-flight (one batched round of questions while you're still at the keyboard), then conducts unattended: one fresh-context builder per phase, waves from the specs' dependencies, worktrees where `--parallel` and disjoint surfaces allow — per phase: tests red -> build green -> gate -> panel -> commit, on a branch, never merging.
 
-**The panel** (`/ps-review`, also standalone): independent fresh-context judges over the diff — correctness per surface, parsimony (the over-engineering hunt), **product** (built vs specced: gaps, invented scope, intent — with browser eyes on UI phases when the capability is there), security when triggered. Findings come back must-fix / worth-considering / skip-it; conflicts are arbitrated — the spec is the objective function, parsimony wins ties — and every report ends with a manifest line saying which judges ran with which providers. Degraded is allowed; invisible is not.
+**The panel** (`/ps-review`, also standalone): fresh-context judgment over the diff, weighted by risk. The default is **one combined judge** carrying every bar — correctness, parsimony (the over-engineering hunt), **product** (built vs specced: gaps, invented scope, intent — with browser eyes on UI phases when the capability is there) — in a single read; it **splits into the full panel** (separate judges, correctness per surface, security as its own judge) only when the diff earns it: a security surface, a multi-surface diff, `Review: full` in the spec, or you asking. Findings come back must-fix / worth-considering / skip-it; conflicts are arbitrated — the spec is the objective function, parsimony wins ties — and every report ends with a manifest line saying what ran, with which providers, on which model tier. Degraded is allowed; invisible is not. Fresh context is the non-negotiable; headcount isn't.
 
-Both gears stop at `/ps-close` — verify the criteria against the tests, run the panel over the whole diff, record ADRs, checkpoint, merge. **Shipping is always your call.**
+Both gears stop at `/ps-close` — verify the criteria against the tests, review what's being shipped (one integrated judge over the final tree when every phase already closed clean; the full panel for anything parked or flagged), record ADRs, checkpoint, merge. **Shipping is always your call.**
 
 **Every session:** `/ps-resume` to load (docs + git + tests -> a briefing and the next action), `/ps-checkpoint` to save the handoff. **Now and then:** `/ps-doctor` when the environment changed or a manifest line surprises you; `/ps-init` when work happened *outside* the skills (manual commits, another agent, a long gap) — it audits every doc against code, git, and the tests, then repairs the drift with your sign-off. Reality wins; the docs get corrected, never the other way around.
 
@@ -166,6 +182,8 @@ Full activity map: [PSTACK.md](./PSTACK.md). Worked example, dump to build: [EXA
 **2.1** — continuity: named dumps (`/ps-start dump2.md`), extend-mode planning from reality (STATE.md + git, not just the roadmap), and concurrent runs — one working tree per run, sibling worktrees off main, `ps/<slug>` branches with git itself as the registry, cross-run blocking via one rule (a dependency is satisfied only when its phase has landed on main), and one-at-a-time landing at `/ps-close`. See CHANGELOG.md and ADR 0004.
 
 **2.2** — the craft tier: builders gain model-invoked *moves*, borrowed rather than built (ADR 0005) — a curated mattpocock/skills subset (`prototype`, `diagnosing-bugs`, `resolving-merge-conflicts`, `domain-modeling`, `research`) named in the Capabilities map, invoked by builders when the situation matches. Specs can mark `[OPEN-SPIKE: ...]` questions for the prototype skill to answer instead of the human; captures land in pstack artifacts via a CLAUDE.md standing rule; `CONTEXT.md` becomes the glossary artifact. Process is owned, craft is borrowed: pstack marks the moments, providers supply the moves. Also new: `/ps-init` (audit and realign the docs with the code — see above), and first-class OpenCode support (it reads pstack's existing skill trees natively).
+
+**2.3** — proportionality (ADR 0006), tuned from a real 27-agent, 5h38m field run: the panel defaults to one combined fresh-context judge and splits only when the diff earns it; panel fixes return to the phase's still-warm builder instead of a fresh fix agent; every spawned pack carries an output-discipline block (file-by-file, no restating files in prose or thinking, draft deliverables in the file — born from seven agent deaths at the 64k output cap on a prose-heavy phase, overflow deaths now resume with smaller work units); `model-tiers` routes spawns by task nature (see [Model selection](#model-selection--one-line-three-tiers)); `/ps-close` weighs its review by what already ran. Migration: none — no `model-tiers` line means the session model everywhere, and the split panel is one `Review: full` spec line away.
 
 Migration is a no-op: v1 projects run unchanged. The new spec sections are optional — no Coordination blocks means a linear run, exactly v1's behavior; no providers installed means the panel judges use their inline bars, which are v1's review bars. Add structure and providers only where they pay.
 

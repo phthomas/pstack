@@ -45,7 +45,7 @@ New session, cold context. Rehydrate before touching anything:
 > /ps-resume
 → 01 done, 02 done, 03 stopped at its hardstop (triage API credentials).
   The panel applied 3 simplifications; 1 judgment call flagged
-  (panel: correctness ✓ inline · parsimony ✓ inline · product ✓ · security — not triggered)
+  (panel: light ✓ combined (session model) · security — not triggered)
   (dashboard caching). Tests: 01 + 02 green, 03 red.
   Next action: deep-QA the flagged item, then /ps-close.
 > /ps-close
