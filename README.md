@@ -113,16 +113,20 @@ Then run `/ps-doctor`: it prints the manifest (capability — provider — gap +
 Where the harness can pick a model per spawned agent (Claude Code's Task tool can; OpenCode's per-agent config can; a plain Codex session can't), the Capabilities map carries one more line, and the build skills route every spawn through it:
 
 ```markdown
-- model-tiers: deep = session model · standard = sonnet · mechanical = haiku | fallback: everything on the session model
+- model-tiers: deep = session model · standard = sonnet · mechanical = sonnet | fallback: everything on the session model
 ```
 
 Tiers map **task nature -> model, never role -> model** — a "judge" can be forensic or a formality, a "builder" can be designing or transcribing, so roles are the wrong key:
 
 - **deep** — design judgment, independent verdicts, prose craft, anything security-touched. Anchored to the *session model* on purpose: whatever you launched with is the ceiling, the map only ever downgrades below it, and it can't go stale as model names churn. Launch on a cheaper model and the tiers collapse gracefully.
 - **standard** — routine building against a clear spec. Builders default here; a spec with `Complexity: hard` in its Coordination block promotes its builder to deep.
-- **mechanical** — applying already-decided fixes, recounts, delta re-checks. Work whose quality is guaranteed by the gate re-running afterwards, not by the model doing it.
+- **mechanical** — applying already-decided fixes, recounts, delta re-checks. Work whose quality is guaranteed by the gate re-running afterwards, not by the model doing it. Default it to the **same rung as standard** — one below the session model, not two: small models flail on real edits, and a flailing fixer costs more than it saves. The tier's identity is its discipline, its escalation semantics, and low reasoning effort where that knob exists — not necessarily a different model. Map it lower only for genuinely deterministic chores.
 
-Classification will sometimes be wrong, so it's cheap to be wrong instead of forbidden: a failed or parked agent retries once, one tier up; security always runs deep; the mechanical gate re-runs after mechanical-tier work regardless; and every manifest line and morning report names the tier each agent ran on — the reports teach you the tuning. No `model-tiers` line, or no per-spawn selection in your harness: everything runs on the session model, visibly. Why this shape and not a config file or per-role routing: ADR 0006.
+Classification will sometimes be wrong, so it's cheap to be wrong instead of forbidden: a failed or parked agent retries once on the next *distinct* tier up; security always runs deep; the mechanical gate re-runs after mechanical-tier work regardless; and every manifest line and morning report names the tier each agent ran on — the reports teach you the tuning. No `model-tiers` line, or no per-spawn selection in your harness: everything runs on the session model, visibly. Why this shape and not a config file or per-role routing: ADR 0006.
+
+**And thinking? It inherits.** On most harnesses a spawned agent gets the session's reasoning effort, and there is no per-spawn thinking knob (Claude Code's Task tool takes a model, not a thinking budget; `MAX_THINKING_TOKENS` is session-wide) — which is exactly how a mechanical fixer on a frontier model came to burn 64,000 tokens of thinking before its first tool call. So pstack controls thinking where it actually can: the output-discipline block in every pack — draft in the file, not in your head; tool-call early — which bounds thinking by bounding the work unit. Where a harness does expose per-spawn effort, tier it like the models: deep inherits the session's effort, mechanical runs low.
+
+**Verify, don't trust:** neither the Claude Code CLI nor the desktop app shows which model a running subagent is on, and manifest lines are the conductor *self-reporting*. `scripts/agent-models.sh`, run from a project root, reads Claude Code's own transcripts and prints agent -> model for every spawn — the audit that catches a run that claimed mechanical but spawned everything on deep. Claude Code only (other harnesses don't write those transcripts; there the manifest is the pointer); optional diagnostic, never load-bearing.
 
 The document templates in this repo (`PRODUCT.md`, `CLAUDE.md`, `ROADMAP.md`, `specs/_TEMPLATE.md`, `STATE.md`, …) show the artifacts the workflow maintains — you don't copy them in by hand; `/ps-start` writes the docs into your project from your dump, and `/ps-checkpoint` keeps `STATE.md` current. The one file you start with is your own `dump.md`.
 

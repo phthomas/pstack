@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.3.1 — the mechanical floor
+
+- **Mechanical defaults to the rung one below the session model — the same rung as standard, not two below.** Small models flail on real edits, and a flailing fixer costs more than it saves. The tier's identity is its discipline, its escalation semantics, and low reasoning effort where that knob exists — not necessarily a different model; map it lower only for genuinely deterministic chores. Retry semantics refined to match: a failed agent escalates to the next *distinct* tier up.
+- **Thinking inheritance documented.** Spawned agents inherit the session's reasoning effort on most harnesses — there is no per-spawn thinking knob (Claude Code's Task tool takes a model, not a thinking budget) — so the packs' output-discipline block is the real control: it bounds thinking by bounding the work unit. Where a per-spawn effort knob exists, it tiers like the models (deep inherits, mechanical low). /ps-doctor now probes for the knob. ADR 0006 stands unedited — it pinned deep = session model and deliberately left the lower rungs to the map.
+- **`scripts/agent-models.sh`** — neither the Claude Code CLI nor the desktop app displays which model a running subagent is on, so this reads Claude Code's own transcripts and prints agent -> model per spawn: the ground truth that audits the manifest lines' self-reported tiers. Claude Code only; on other harnesses it finds no transcripts and exits cleanly — nothing anywhere auto-runs it. Optional diagnostic, never load-bearing.
+
 ## 2.3.0 — the proportionality release
 
 2.0 bought certainty at headcount prices; this release makes the ceremony proportional to the risk — and keeps agents alive on prose-heavy phases (ADR 0006). Born from a real run: 27 subagents and 5h38m for a five-phase MVP, seven agent deaths at the 64k output cap, all runaway thinking on prose work.
